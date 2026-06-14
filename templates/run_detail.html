@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Run Detail — CPS LLP{% endblock %}
+{% block content %}
+<h1 style="font-size:1.4rem;font-weight:800;margin-bottom:.3rem">{{ run.company_name }}</h1>
+<p style="color:#64748b;margin-bottom:1.5rem">{{ month_name }} {{ run.year }} &middot; Run ID: <code>{{ run.id }}</code></p>
+<div class="grid-4" style="margin-bottom:1.5rem">
+  <div class="stat-box"><div class="stat-label">Employees</div><div class="stat-value">{{ run.total_employees }}</div></div>
+  <div class="stat-box"><div class="stat-label">Total Gross</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(run.total_gross or 0) }}</div></div>
+  <div class="stat-box"><div class="stat-label">PF Challan</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(run.total_pf_challan or 0) }}</div></div>
+  <div class="stat-box"><div class="stat-label">ESIC Challan</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(run.total_esic_challan or 0) }}</div></div>
+</div>
+<p><a href="/history" class="btn btn-secondary">&#8592; Back to History</a></p>
+{% endblock %}

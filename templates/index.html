@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Upload Payroll — CPS LLP{% endblock %}
+{% block content %}
+<div style="max-width:640px;margin:auto">
+  <div class="card">
+    <h1 style="font-size:1.5rem;font-weight:800;margin-bottom:.3rem">Run Payroll</h1>
+    <p style="color:#64748b;margin-bottom:1.5rem">Upload a salary CSV or Excel file to compute PF, ESIC, PT and generate ECR, salary slips.</p>
+
+    <form action="/process" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Company Name</label>
+        <input type="text" name="company_name" value="Corporate Personnel Services LLP" required>
+      </div>
+      <div class="form-group">
+        <label>Establishment ID (EPFO)</label>
+        <input type="text" name="establishment_id" value="MH/MUM/12345" required>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Month</label>
+          <select name="month" required>
+            {% for n, mname in [("1","January"),("2","February"),("3","March"),("4","April"),("5","May"),("6","June"),("7","July"),("8","August"),("9","September"),("10","October"),("11","November"),("12","December")] %}
+            <option value="{{ n }}">{{ mname }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" name="year" value="2026" min="2020" max="2030" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Salary File (.csv or .xlsx)</label>
+        <input type="file" name="file" accept=".csv,.xlsx,.xls" required>
+        <p style="font-size:.8rem;color:#94a3b8;margin-top:.4rem">
+          Columns needed: emp_id, name, basic, da, hra, other_allowances, days_in_month, days_worked, uan (optional)
+          &nbsp;&middot;&nbsp;<a href="/sample-csv" style="color:#2563eb">Download sample CSV</a>
+        </p>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:.8rem">
+        &#9654; Run Payroll
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

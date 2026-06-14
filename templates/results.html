@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Results — {{ company_name }}{% endblock %}
+{% block content %}
+<h1 style="font-size:1.4rem;font-weight:800;margin-bottom:.3rem">{{ company_name }}</h1>
+<p style="color:#64748b;margin-bottom:1.5rem">{{ month_name }} {{ year }} &middot; {{ summary.total_employees }} employees</p>
+
+<div class="grid-4" style="margin-bottom:1.5rem">
+  <div class="stat-box"><div class="stat-label">Total Gross</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(summary.total_gross) }}</div></div>
+  <div class="stat-box"><div class="stat-label">Total Net Pay</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(summary.total_net) }}</div></div>
+  <div class="stat-box"><div class="stat-label">PF Challan</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(summary.total_pf_challan) }}</div></div>
+  <div class="stat-box"><div class="stat-label">ESIC Challan</div><div class="stat-value">&#8377;{{ "{:,.0f}".format(summary.total_esic_challan) }}</div></div>
+</div>
+
+<div class="card">
+  <div class="section-title">Downloads</div>
+  <div style="display:flex;flex-wrap:wrap;gap:.7rem">
+    <a href="/download/ecr/{{ session_id }}" class="btn btn-primary">&#11015; ECR TXT (EPFO)</a>
+    <a href="/download/esic/{{ session_id }}" class="btn btn-secondary">&#11015; ESIC CSV</a>
+    <a href="/download/payroll-register/{{ session_id }}" class="btn btn-secondary">&#11015; Payroll Register</a>
+    <a href="/download/bank-file/{{ session_id }}" class="btn btn-secondary">&#11015; Bank Payment File</a>
+    <a href="/download/all-slips/{{ session_id }}" class="btn btn-green">&#11015; All Salary Slips (ZIP)</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">Statutory Summary</div>
+  <div class="grid-2">
+    <table>
+      <tr><th>Component</th><th>Amount</th></tr>
+      <tr><td>Employee PF (12%)</td><td>&#8377;{{ "{:,.0f}".format(summary.total_employee_pf) }}</td></tr>
+      <tr><td>Employer EPF (3.67%)</td><td>&#8377;{{ "{:,.0f}".format(summary.total_employer_epf) }}</td></tr>
+      <tr><td>Employer EPS (8.33%)</td><td>&#8377;{{ "{:,.0f}".format(summary.total_employer_eps) }}</td></tr>
+      <tr style="font-weight:700"><td>Total PF Challan</td><td>&#8377;{{ "{:,.0f}".format(summary.total_pf_challan) }}</td></tr>
+    </table>
+    <table>
+      <tr><th>Component</th><th>Amount</th></tr>
+      <tr><td>Employee ESIC (0.75%)</td><td>&#8377;{{ "{:,.0f}".format(summary.total_employee_esic) }}</td></tr>
+      <tr><td>Employer ESIC (3.25%)</td><td>&#8377;{{ "{:,.0f}".format(summary.total_employer_esic) }}</td></tr>
+      <tr style="font-weight:700"><td>Total ESIC Challan</td><td>&#8377;{{ "{:,.0f}".format(summary.total_esic_challan) }}</td></tr>
+      <tr><td>Professional Tax</td><td>&#8377;{{ "{:,.0f}".format(summary.total_pt) }}</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">Employee Detail</div>
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Days</th><th>Gross</th><th>Emp PF</th><th>ESIC</th><th>PT</th><th>Net Pay</th><th>Slip</th></tr>
+    </thead>
+    <tbody>
+    {% for r in results %}
+    <tr>
+      <td>{{ r.emp_id }}</td>
+      <td>{{ r.name }}</td>
+      <td>{{ r.days_worked }}/{{ r.days_in_month }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.gross_earned) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.employee_pf) }}</td>
+      <td>{% if r.esic_applicable %}&#8377;{{ "{:,.0f}".format(r.employee_esic) }}{% else %}<span class="badge badge-gray">N/A</span>{% endif %}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.professional_tax) }}</td>
+      <td style="font-weight:700">&#8377;{{ "{:,.0f}".format(r.net_pay) }}</td>
+      <td><a href="/download/slip/{{ session_id }}/{{ r.emp_id }}" class="btn btn-secondary" style="padding:.3rem .7rem;font-size:.8rem">PDF</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<p style="margin-top:1rem"><a href="/" class="btn btn-secondary">&#8592; Run another</a></p>
+{% endblock %}

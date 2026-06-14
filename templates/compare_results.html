@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Comparison Results — CPS LLP{% endblock %}
+{% block content %}
+<h1 style="font-size:1.4rem;font-weight:800;margin-bottom:.3rem">Comparison Results</h1>
+<p style="color:#64748b;margin-bottom:1.5rem">{{ month_name }} {{ year }} &middot; {{ companies|length }} companies processed</p>
+
+{% if errors %}
+<div class="alert-error" style="margin-bottom:1rem">
+  <strong>Errors:</strong>
+  <ul style="margin-top:.4rem;margin-left:1rem">
+    {% for e in errors %}<li>{{ e.company }}: {{ e.error }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="section-title">Company Scorecard</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Company</th><th>Employees</th>
+        <th>Our Gross</th><th>Our PF Challan</th><th>Our ESIC</th>
+        <th>NB Matched</th><th>Diverged</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for c in companies %}
+    <tr>
+      <td style="font-weight:600">{{ c.name }}</td>
+      <td>{{ c.summary.total_employees }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(c.summary.total_gross) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(c.summary.total_pf_challan) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(c.summary.total_esic_challan) }}</td>
+      {% if c.has_nb %}
+      <td><span class="badge badge-green">{{ c.match_count }} &#10003;</span></td>
+      <td><span class="badge {{ 'badge-red' if c.diverge_count > 0 else 'badge-green' }}">{{ c.diverge_count }}</span></td>
+      <td>{% if c.diverge_count == 0 %}<span class="badge badge-green">All Match</span>{% else %}<span class="badge badge-red">{{ c.diverge_count }} Issues</span>{% endif %}</td>
+      {% else %}
+      <td colspan="3"><span class="badge badge-gray">No New Boss file</span></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% for c in companies %}
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+    <div class="section-title" style="margin-bottom:0">{{ c.name }}</div>
+    {% if c.has_nb %}
+    <span class="badge {{ 'badge-green' if c.diverge_count == 0 else 'badge-red' }}">
+      {{ c.match_count }} match &middot; {{ c.diverge_count }} diverge
+    </span>
+    {% endif %}
+  </div>
+
+  {% if c.has_nb %}
+  <div style="overflow-x:auto">
+  <table>
+    <thead>
+      <tr>
+        <th>UAN/ID</th><th>Name</th>
+        <th>Our Gross</th><th>NB Gross</th>
+        <th>Our Emp PF</th><th>NB Emp PF</th>
+        <th>Our EPF Wages</th><th>NB EPF Wages</th>
+        <th>NCP Days</th><th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in c.comparison_rows %}
+    {% set has_diverge = row.cmp.all_match == false %}
+    <tr style="{{ 'background:#fff7f7' if has_diverge else '' }}">
+      <td>{{ row.key }}</td>
+      <td>{{ row.name }}</td>
+      {% set g_our = row.our.get('gross_earned', '') %}
+      {% set g_nb  = row.nb.get('gross_wages', '') %}
+      <td>{% if g_our %}&#8377;{{ "{:,.0f}".format(g_our) }}{% else %}—{% endif %}</td>
+      <td {% if g_our != '' and g_nb != '' and (g_our - g_nb)|abs > 1 %}style="color:#dc2626;font-weight:700"{% endif %}>
+        {% if g_nb %}&#8377;{{ "{:,.0f}".format(g_nb) }}{% else %}—{% endif %}
+      </td>
+      {% set pf_our = row.our.get('employee_pf', '') %}
+      {% set pf_nb  = row.nb.get('employee_pf', '') %}
+      <td>{% if pf_our %}&#8377;{{ "{:,.0f}".format(pf_our) }}{% else %}—{% endif %}</td>
+      <td {% if pf_our != '' and pf_nb != '' and (pf_our - pf_nb)|abs > 1 %}style="color:#dc2626;font-weight:700"{% endif %}>
+        {% if pf_nb %}&#8377;{{ "{:,.0f}".format(pf_nb) }}{% else %}—{% endif %}
+      </td>
+      {% set w_our = row.our.get('pf_wages', '') %}
+      {% set w_nb  = row.nb.get('epf_wages', '') %}
+      <td>{% if w_our %}&#8377;{{ "{:,.0f}".format(w_our) }}{% else %}—{% endif %}</td>
+      <td {% if w_our != '' and w_nb != '' and (w_our - w_nb)|abs > 1 %}style="color:#dc2626;font-weight:700"{% endif %}>
+        {% if w_nb %}&#8377;{{ "{:,.0f}".format(w_nb) }}{% else %}—{% endif %}
+      </td>
+      {% set n_our = row.our.get('ncp_days', '') %}
+      {% set n_nb  = row.nb.get('ncp_days', '') %}
+      <td {% if n_our != '' and n_nb != '' and n_our != n_nb %}style="color:#dc2626;font-weight:700"{% endif %}>
+        {{ n_our if n_our != '' else '—' }} / {{ n_nb if n_nb != '' else '—' }}
+      </td>
+      <td>
+        {% if row.cmp.all_match is none %}<span class="badge badge-gray">No NB</span>
+        {% elif row.cmp.all_match %}<span class="badge badge-green">&#10003; Match</span>
+        {% else %}<span class="badge badge-red">&#10007; Diverge</span>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {% else %}
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Gross</th><th>Emp PF</th><th>EPF Wages</th><th>Net Pay</th></tr>
+    </thead>
+    <tbody>
+    {% for r in c.results %}
+    <tr>
+      <td>{{ r.emp_id }}</td><td>{{ r.name }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.gross_earned) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.employee_pf) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.pf_wages) }}</td>
+      <td style="font-weight:700">&#8377;{{ "{:,.0f}".format(r.net_pay) }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endfor %}
+
+<p style="margin-top:1rem">
+  <a href="/compare" class="btn btn-secondary">&#8592; New comparison</a>
+  <a href="/" class="btn btn-secondary" style="margin-left:.5rem">Single company</a>
+</p>
+{% endblock %}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CPS LLP Payroll Copilot{% endblock %}</title>
+  <script src="/static/app.js" defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+    nav { background: #1e3a5f; color: white; padding: .9rem 2rem; display: flex; align-items: center; gap: 2rem; }
+    nav a { color: #cbd5e1; text-decoration: none; font-size: .9rem; }
+    nav a:hover { color: white; }
+    nav .brand { font-weight: 700; font-size: 1.1rem; color: white; letter-spacing: -.3px; }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); padding: 2rem; margin-bottom: 1.5rem; }
+    .btn { display: inline-block; padding: .6rem 1.4rem; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
+    .btn-primary { background: #1e3a5f; color: white; }
+    .btn-primary:hover { background: #162d4a; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-green { background: #16a34a; color: white; }
+    .btn-green:hover { background: #15803d; }
+    .badge { display: inline-block; padding: .2rem .6rem; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    .badge-yellow { background: #fef9c3; color: #854d0e; }
+    .badge-gray { background: #f1f5f9; color: #475569; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th { background: #f1f5f9; text-align: left; padding: .6rem .8rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; color: #64748b; }
+    td { padding: .55rem .8rem; border-bottom: 1px solid #f1f5f9; }
+    tr:hover td { background: #fafafa; }
+    input, select { padding: .5rem .75rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: .9rem; width: 100%; }
+    label { display: block; font-size: .85rem; font-weight: 600; color: #374151; margin-bottom: .3rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .stat-box { background: white; border-radius: 10px; padding: 1rem 1.2rem; box-shadow: 0 1px 3px rgba(0,0,0,.07); }
+    .stat-label { font-size: .75rem; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-top: .2rem; }
+    #loading-overlay { display:none; position:fixed; inset:0; background:rgba(255,255,255,.85); z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
+    .spinner { width:40px; height:40px; border:4px solid #e2e8f0; border-top-color:#1e3a5f; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .alert-error { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; border-radius:8px; padding:.8rem 1rem; margin-bottom:1rem; }
+    .section-title { font-size:1.1rem; font-weight:700; margin-bottom:1rem; color:#1e3a5f; }
+    @media(max-width:700px) { .grid-2,.grid-3,.grid-4 { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p style="color:#1e3a5f;font-weight:600">Processing payroll…</p>
+</div>
+<nav>
+  <span class="brand">CPS LLP &middot; Payroll Copilot</span>
+  <a href="/">Single Company</a>
+  <a href="/compare">5-Company Compare</a>
+  <a href="/history">Audit History</a>
+</nav>
+<div class="container">
+{% block content %}{% endblock %}
+</div>
+</body>
+</html>

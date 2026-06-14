@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Audit History — CPS LLP{% endblock %}
+{% block content %}
+<h1 style="font-size:1.4rem;font-weight:800;margin-bottom:.3rem">Audit History</h1>
+<p style="color:#64748b;margin-bottom:1.5rem">All payroll runs persisted to Supabase.</p>
+<div class="card">
+  {% if runs %}
+  <table>
+    <thead>
+      <tr><th>Date</th><th>Company</th><th>Period</th><th>Employees</th><th>Gross</th><th>PF Challan</th><th>ESIC Challan</th><th></th></tr>
+    </thead>
+    <tbody>
+    {% for r in runs %}
+    <tr>
+      <td>{{ r.created_at[:10] }}</td>
+      <td style="font-weight:600">{{ r.company_name }}</td>
+      <td>{{ month_names.get(r.month, r.month) }} {{ r.year }}</td>
+      <td>{{ r.total_employees }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.total_gross or 0) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.total_pf_challan or 0) }}</td>
+      <td>&#8377;{{ "{:,.0f}".format(r.total_esic_challan or 0) }}</td>
+      <td><a href="/run/{{ r.id }}" class="btn btn-secondary" style="padding:.3rem .7rem;font-size:.8rem">View</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p style="color:#94a3b8;text-align:center;padding:2rem">No runs yet — or Supabase not configured.</p>
+  {% endif %}
+</div>
+{% endblock %}

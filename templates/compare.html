@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}5-Company Compare — CPS LLP{% endblock %}
+{% block content %}
+<div style="max-width:800px;margin:auto">
+  <div class="card">
+    <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:.3rem">5-Company Comparison</h1>
+    <p style="color:#64748b;margin-bottom:1.5rem">
+      Upload up to 5 companies' salary files. Optionally upload the New Boss ECR .txt for each to validate our output against it.
+    </p>
+
+    <form action="/compare" method="post" enctype="multipart/form-data">
+      <div class="grid-2" style="margin-bottom:1.5rem">
+        <div class="form-group">
+          <label>Month</label>
+          <select name="month" required>
+            {% for n, mname in [("1","January"),("2","February"),("3","March"),("4","April"),("5","May"),("6","June"),("7","July"),("8","August"),("9","September"),("10","October"),("11","November"),("12","December")] %}
+            <option value="{{ n }}">{{ mname }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" name="year" value="2026" min="2020" max="2030" required>
+        </div>
+      </div>
+
+      {% for i in range(1, 6) %}
+      <div style="background:#f8fafc;border-radius:10px;padding:1rem;margin-bottom:1rem;border:1px solid #e2e8f0">
+        <div style="font-weight:700;margin-bottom:.7rem;color:#1e3a5f">Company {{ i }}</div>
+        <div class="form-group">
+          <label>Company Name</label>
+          <input type="text" name="company_name_{{ i }}" placeholder="e.g. ABC Pvt Ltd">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Salary File (.csv / .xlsx)</label>
+            <input type="file" name="file_{{ i }}" accept=".csv,.xlsx,.xls">
+          </div>
+          <div class="form-group">
+            <label>New Boss ECR .txt <span style="font-weight:400;color:#94a3b8">(optional)</span></label>
+            <input type="file" name="nb_file_{{ i }}" accept=".txt">
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-primary" style="width:100%;padding:.8rem;margin-top:.5rem">
+        &#9654; Run Comparison
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
