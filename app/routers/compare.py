@@ -1,4 +1,5 @@
 import io
+import uuid
 from typing import Optional
 
 import pandas as pd
@@ -7,7 +8,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from app.payroll_engine import calculate_payroll, MONTH_NAMES
-from app.routers.payroll import parse_file, build_employees, build_summary
+from app.ecr_generator import generate_ecr, generate_esic_csv
+from app.routers.payroll import parse_file, build_employees, build_summary, SESSIONS
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -122,6 +124,21 @@ async def run_comparison(
                 nb_content = await nb_file.read()
                 nb_map = _parse_newboss_txt(nb_content)
 
+            # Generate outputs and store in shared SESSIONS so download routes work
+            ecr_text  = generate_ecr(results, "MH/MUM/00000", name or f"Company {idx}", month, year)
+            esic_text = generate_esic_csv(results, month, year)
+            session_id = str(uuid.uuid4())
+            SESSIONS[session_id] = {
+                "results": results,
+                "ecr_text": ecr_text,
+                "esic_text": esic_text,
+                "company_name": name or f"Company {idx}",
+                "establishment_id": "MH/MUM/00000",
+                "month": month,
+                "year": year,
+                "summary": summary,
+            }
+
             all_keys = set(our_map.keys()) | set(nb_map.keys())
             comparison_rows = []
             for key in sorted(all_keys):
@@ -140,6 +157,7 @@ async def run_comparison(
             companies.append({
                 "name": name or f"Company {idx}",
                 "file": salary_file.filename,
+                "session_id": session_id,
                 "has_nb": bool(nb_map),
                 "results": results,
                 "summary": summary,

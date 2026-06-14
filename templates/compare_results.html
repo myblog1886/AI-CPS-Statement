@@ -55,6 +55,15 @@
     {% endif %}
   </div>
 
+  <!-- Downloads for this company -->
+  <div style="display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid #f1f5f9">
+    <a href="/download/ecr/{{ c.session_id }}" class="btn btn-primary" style="font-size:.82rem;padding:.45rem 1rem">&#11015; ECR TXT</a>
+    <a href="/download/esic/{{ c.session_id }}" class="btn btn-secondary" style="font-size:.82rem;padding:.45rem 1rem">&#11015; ESIC CSV</a>
+    <a href="/download/payroll-register/{{ c.session_id }}" class="btn btn-secondary" style="font-size:.82rem;padding:.45rem 1rem">&#11015; Payroll Register</a>
+    <a href="/download/bank-file/{{ c.session_id }}" class="btn btn-secondary" style="font-size:.82rem;padding:.45rem 1rem">&#11015; Bank File</a>
+    <a href="/download/all-slips/{{ c.session_id }}" class="btn btn-green" style="font-size:.82rem;padding:.45rem 1rem">&#11015; Salary Slips ZIP</a>
+  </div>
+
   {% if c.has_nb %}
   <div style="overflow-x:auto">
   <table>
