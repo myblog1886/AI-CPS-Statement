@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll Results — {{ company_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0f2f8; min-height: 100vh; color: #1a1a1a; }
+
+  nav {
+    background: #243673; color: white;
+    padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .brand { display: flex; align-items: center; gap: .8rem; }
+  nav .logo-box {
+    background: #3b4fe4; font-family: 'Poppins', sans-serif;
+    font-weight: 800; font-size: 1rem; padding: .3rem .7rem; border-radius: 6px;
+  }
+  nav .brand-text { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; }
+  nav a.back { color: rgba(255,255,255,.8); text-decoration: none; font-size: .83rem; }
+  nav a.back:hover { color: white; text-decoration: underline; }
+
+  .page { max-width: 1380px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; }
+
+  /* ── Company bar ── */
+  .company-bar {
+    background: white; border-radius: 12px; padding: 1rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem;
+    border-left: 5px solid #3b4fe4;
+  }
+  .company-bar h1 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; color: #243673; font-weight: 800; }
+  .company-bar p  { font-size: .82rem; color: #6e7180; margin-top: .1rem; }
+  .period-badge {
+    background: #eef0ff; border: 1.5px solid #a5b4fc; color: #3b4fe4;
+    padding: .4rem 1rem; border-radius: 999px;
+    font-family: 'Poppins', sans-serif; font-size: .83rem; font-weight: 700;
+  }
+
+  /* ── Summary cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1rem; margin-bottom: 1.4rem; }
+  .card {
+    background: white; border-radius: 12px; padding: 1rem 1.2rem;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08);
+    border-top: 4px solid var(--accent);
+  }
+  .card .label { font-family: 'Poppins', sans-serif; font-size: .7rem; color: #6e7180; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .card .value { font-family: 'Poppins', sans-serif; font-size: 1.45rem; font-weight: 800; color: #1a1a1a; margin-top: .2rem; }
+  .card .sub   { font-size: .72rem; color: #9ca3af; margin-top: .1rem; }
+  .card.blue   { --accent: #3b4fe4; } .card.navy   { --accent: #243673; }
+  .card.green  { --accent: #059669; } .card.red    { --accent: #dc2626; }
+  .card.purple { --accent: #7c3aed; } .card.amber  { --accent: #d97706; }
+  .card.teal   { --accent: #0891b2; }
+
+  /* ── Download bar ── */
+  .dl-bar {
+    background: white; border-radius: 12px; padding: .9rem 1.4rem;
+    display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem;
+  }
+  .dl-bar span { font-family: 'Poppins', sans-serif; font-size: .82rem; font-weight: 700; color: #243673; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem;
+    padding: .45rem 1rem; border-radius: 8px; font-size: .78rem; font-weight: 600;
+    font-family: 'Poppins', sans-serif; text-decoration: none; border: 1.5px solid; transition: all .15s;
+  }
+  .btn:hover { transform: translateY(-1px); filter: brightness(.93); }
+  .btn-ecr     { background: #eef0ff; color: #3b4fe4; border-color: #a5b4fc; }
+  .btn-esic    { background: #ecfdf5; color: #065f46; border-color: #6ee7b7; }
+  .btn-zip     { background: #f5f3ff; color: #6d28d9; border-color: #c4b5fd; }
+  .btn-bank    { background: #fffbeb; color: #92400e; border-color: #fcd34d; }
+  .btn-reg     { background: #f0fdf4; color: #166534; border-color: #86efac; }
+  .btn-challan { background: #243673; color: white;   border-color: #243673; }
+  .btn-challan:hover { background: #1a2a5e; }
+
+  /* ── Section ── */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; }
+  .section-head h2 { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; color: #243673; }
+
+  /* ── Table ── */
+  .table-wrap { background: white; border-radius: 12px; overflow: auto; box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .79rem; }
+  thead tr { background: #243673; color: white; }
+  thead th { padding: .65rem .7rem; text-align: right; font-family: 'Poppins', sans-serif; font-weight: 600; white-space: nowrap; }
+  thead th:first-child, thead th:nth-child(2) { text-align: left; }
+  tbody tr:nth-child(even) { background: #f8f9ff; }
+  tbody tr:hover { background: #eef0ff; }
+  tbody td { padding: .6rem .7rem; border-bottom: 1px solid #f3f4f6; text-align: right; }
+  tbody td:first-child, tbody td:nth-child(2) { text-align: left; }
+  tbody tr:last-child td { border: none; }
+  .emp-id   { font-family: 'Poppins', sans-serif; font-weight: 700; color: #3b4fe4; }
+  .emp-name { font-weight: 600; color: #1a1a1a; }
+  .emp-sub  { font-size: .72rem; color: #9ca3af; }
+  .gross    { font-weight: 700; }
+  .net      { font-weight: 800; color: #166534; background: #dcfce7 !important; padding: .6rem .7rem; }
+  .dedn     { color: #b91c1c; }
+  .na       { color: #9ca3af; font-style: italic; }
+  .tag-esic-yes { background: #dcfce7; color: #166534; padding: .12rem .45rem; border-radius: 4px; font-size: .68rem; font-weight: 700; }
+  .tag-esic-no  { background: #f3f4f6; color: #9ca3af;  padding: .12rem .45rem; border-radius: 4px; font-size: .68rem; font-weight: 700; }
+  .slip-btn {
+    display: inline-flex; align-items: center; gap: .25rem;
+    padding: .28rem .65rem; background: #3b4fe4; color: white;
+    border-radius: 6px; font-size: .72rem; font-weight: 600;
+    text-decoration: none; font-family: 'Poppins', sans-serif; white-space: nowrap;
+  }
+  .slip-btn:hover { background: #243673; }
+
+  /* ── Challan cards ── */
+  .challan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; margin-bottom: 1.4rem; }
+  @media (max-width: 900px) { .challan-grid { grid-template-columns: 1fr; } }
+  .challan-card {
+    background: white; border-radius: 12px; padding: 1.2rem 1.4rem;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08);
+  }
+  .challan-card h3 {
+    font-family: 'Poppins', sans-serif; font-size: .9rem; font-weight: 700;
+    margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 2px solid;
+  }
+  .challan-card.pf   h3 { color: #3b4fe4; border-color: #a5b4fc; }
+  .challan-card.esic h3 { color: #065f46; border-color: #6ee7b7; }
+  .challan-card.other h3 { color: #92400e; border-color: #fcd34d; }
+  .challan-row { display: flex; justify-content: space-between; padding: .4rem 0; border-bottom: 1px solid #f3f4f6; font-size: .82rem; }
+  .challan-row:last-child { border: none; }
+  .challan-row .lbl { color: #6e7180; }
+  .challan-row .amt { font-weight: 700; }
+  .challan-total { display: flex; justify-content: space-between; padding: .55rem .8rem; border-radius: 8px; margin-top: .6rem; font-family: 'Poppins', sans-serif; font-size: .88rem; font-weight: 800; }
+  .challan-card.pf   .challan-total { background: #eef0ff; color: #3b4fe4; }
+  .challan-card.esic .challan-total { background: #ecfdf5; color: #065f46; }
+  .challan-card.other .challan-total { background: #fffbeb; color: #92400e; }
+
+  /* ── ECR preview ── */
+  .ecr-wrap { background: white; border-radius: 12px; padding: 1.2rem 1.4rem; box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1rem; }
+  .ecr-preview {
+    background: #1e293b; color: #94a3b8; border-radius: 10px;
+    padding: 1.1rem 1.3rem; font-family: 'Courier New', monospace; font-size: .76rem;
+    line-height: 1.7; overflow-x: auto; white-space: pre; margin-top: .8rem;
+  }
+  .ecr-preview .hdr { color: #f472b6; font-weight: bold; }
+  .ecr-preview .uan { color: #38bdf8; }
+
+  /* ── Challan confirm CTA ── */
+  .challan-cta {
+    background: linear-gradient(135deg, #243673 0%, #3b4fe4 100%);
+    border-radius: 12px; padding: 1.5rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.4rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .challan-cta .text h3 { font-family: 'Poppins', sans-serif; color: white; font-size: 1rem; font-weight: 700; }
+  .challan-cta .text p  { color: rgba(255,255,255,.75); font-size: .82rem; margin-top: .2rem; }
+  .btn-confirm {
+    background: white; color: #243673; border: none;
+    padding: .7rem 1.6rem; border-radius: 8px; font-family: 'Poppins', sans-serif;
+    font-size: .88rem; font-weight: 700; text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem; white-space: nowrap;
+  }
+  .btn-confirm:hover { background: #eef0ff; }
+
+  footer { background: #243673; color: rgba(255,255,255,.6); text-align: center; font-size: .76rem; padding: 1.5rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="logo-box">CPS</div>
+    <div>
+      <div class="brand-text">Corporate Personnel Services LLP</div>
+    </div>
+  </div>
+  <a href="/" class="back">← New Payroll Run</a>
+</nav>
+
+<div class="page">
+
+  <!-- Company bar -->
+  <div class="company-bar">
+    <div>
+      <h1>{{ company_name }}</h1>
+      <p>Payroll processed for <strong>{{ results|length }} employees</strong></p>
+    </div>
+    <div class="period-badge">📅 {{ month_name }} {{ year }}</div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card blue"><div class="label">Employees</div><div class="value">{{ summary.total_employees }}</div><div class="sub">{{ summary.esic_count }} ESIC eligible</div></div>
+    <div class="card green"><div class="label">Total Gross</div><div class="value">₹{{ "{:,.0f}".format(summary.total_gross) }}</div><div class="sub">Earned this month</div></div>
+    <div class="card teal"><div class="label">Total Net Pay</div><div class="value">₹{{ "{:,.0f}".format(summary.total_net) }}</div><div class="sub">Take-home all employees</div></div>
+    <div class="card red"><div class="label">PF Challan</div><div class="value">₹{{ "{:,.0f}".format(summary.total_pf_challan) }}</div><div class="sub">Emp ₹{{ "{:,.0f}".format(summary.total_employee_pf) }} + Er ₹{{ "{:,.0f}".format(summary.total_employer_pf) }}</div></div>
+    <div class="card purple"><div class="label">ESIC Challan</div><div class="value">₹{{ "{:,.0f}".format(summary.total_esic_challan) }}</div><div class="sub">Emp + Employer</div></div>
+    <div class="card amber"><div class="label">Prof. Tax (MH)</div><div class="value">₹{{ "{:,.0f}".format(summary.total_pt) }}</div><div class="sub">Employee deduction</div></div>
+    <div class="card navy"><div class="label">LWF (MH)</div><div class="value">₹{{ "{:,.0f}".format(summary.total_lwf_employee + summary.total_lwf_employer) }}</div><div class="sub">Emp ₹{{ "{:,.0f}".format(summary.total_lwf_employee) }} + Er ₹{{ "{:,.0f}".format(summary.total_lwf_employer) }}</div></div>
+  </div>
+
+  <!-- Downloads -->
+  <div class="dl-bar">
+    <span>⬇ Downloads:</span>
+    <a href="/download/ecr/{{ session_id }}" class="btn btn-ecr">📄 ECR File (.txt)</a>
+    <a href="/download/ecr-validation-pdf/{{ session_id }}" class="btn btn-ecr" style="background:#fff0f0;color:#8B0000;border-color:#fca5a5">📋 ECR Validation PDF</a>
+    <a href="/download/esic/{{ session_id }}" class="btn btn-esic">🏥 ESIC CSV</a>
+    <a href="/download/bank-file/{{ session_id }}" class="btn btn-bank">🏦 Bank Payment File</a>
+    <a href="/download/payroll-register/{{ session_id }}" class="btn btn-reg">📑 Payroll Register</a>
+    <a href="/download/all-slips/{{ session_id }}" class="btn btn-zip">📦 All Salary Slips (ZIP)</a>
+    <a href="/disburse/{{ session_id }}" class="btn" style="background:#243673;color:white;border-color:#243673;margin-left:auto">🏦 Disburse Salaries →</a>
+  </div>
+
+  <!-- Employee table -->
+  <div class="section-head"><h2>👥 Employee Payroll Details</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID / Name</th><th>Dept</th>
+          <th>Days</th><th>Gross (₹)</th>
+          <th>PF Wages</th><th>Emp PF</th><th>Er EPF</th><th>Er EPS</th>
+          <th>ESIC</th><th>Emp ESIC</th><th>PT</th><th>LWF</th>
+          <th>Net Pay (₹)</th><th>Slip</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>
+            <div class="emp-id">{{ r.emp_id }}</div>
+            <div class="emp-name">{{ r.name }}
+              {% if r.esic_applicable %}<span class="tag-esic-yes">ESIC</span>{% else %}<span class="tag-esic-no">No ESIC</span>{% endif %}
+            </div>
+            {% if r.designation %}<div class="emp-sub">{{ r.designation }}</div>{% endif %}
+          </td>
+          <td style="color:#6e7180;font-size:.76rem">{{ r.department or "—" }}</td>
+          <td>{{ r.days_worked }}/{{ r.days_in_month }}</td>
+          <td class="gross">{{ "{:,.0f}".format(r.gross_earned) }}</td>
+          <td>{{ "{:,.0f}".format(r.pf_wages) }}</td>
+          <td class="dedn">{{ "{:,.0f}".format(r.employee_pf) }}</td>
+          <td>{{ "{:,.0f}".format(r.employer_epf) }}</td>
+          <td>{{ "{:,.0f}".format(r.employer_eps) }}</td>
+          <td>{% if r.esic_applicable %}<span class="tag-esic-yes">₹{{ "{:,.0f}".format(r.gross_earned) }}</span>{% else %}<span class="na">—</span>{% endif %}</td>
+          <td class="dedn">{% if r.esic_applicable %}{{ "{:,.0f}".format(r.employee_esic) }}{% else %}<span class="na">—</span>{% endif %}</td>
+          <td class="dedn">{{ "{:,.0f}".format(r.professional_tax) }}</td>
+          <td class="dedn">{% if r.lwf_employee > 0 %}{{ "{:,.0f}".format(r.lwf_employee) }}{% else %}<span class="na">—</span>{% endif %}</td>
+          <td class="net">{{ "{:,.0f}".format(r.net_pay) }}</td>
+          <td><a href="/download/slip/{{ session_id }}/{{ r.emp_id }}" class="slip-btn">📄 PDF</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Challan summary -->
+  <div class="section-head"><h2>📋 Challan Summary</h2></div>
+  <div class="challan-grid">
+    <div class="challan-card pf">
+      <h3>⚖️ PF Challan — EPFO</h3>
+      <div class="challan-row"><span class="lbl">Employee PF (12%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employee_pf) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer EPF (3.67%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_epf) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer EPS (8.33%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_eps) }}</span></div>
+      <div class="challan-total"><span>Total PF Challan</span><span>₹{{ "{:,.0f}".format(summary.total_pf_challan) }}</span></div>
+    </div>
+    <div class="challan-card esic">
+      <h3>🏥 ESIC Challan</h3>
+      <div class="challan-row"><span class="lbl">Employee Share (0.75%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employee_esic) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer Share (3.25%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_esic) }}</span></div>
+      <div class="challan-row"><span class="lbl">Eligible Employees</span><span class="amt">{{ summary.esic_count }}</span></div>
+      <div class="challan-total"><span>Total ESIC Challan</span><span>₹{{ "{:,.0f}".format(summary.total_esic_challan) }}</span></div>
+    </div>
+    <div class="challan-card other">
+      <h3>📋 Other Statutory</h3>
+      <div class="challan-row"><span class="lbl">Prof. Tax — Employee</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_pt) }}</span></div>
+      <div class="challan-row"><span class="lbl">LWF — Employee (MH)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_lwf_employee) }}</span></div>
+      <div class="challan-row"><span class="lbl">LWF — Employer (MH)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_lwf_employer) }}</span></div>
+      <div class="challan-total"><span>Total Other</span><span>₹{{ "{:,.0f}".format(summary.total_pt + summary.total_lwf_employee + summary.total_lwf_employer) }}</span></div>
+    </div>
+  </div>
+
+  <!-- ECR Preview -->
+  <div class="ecr-wrap">
+    <div class="section-head">
+      <h2>📄 ECR File Preview — EPFO Upload Format</h2>
+      <a href="/download/ecr/{{ session_id }}" class="btn btn-ecr">⬇ Download Full ECR</a>
+    </div>
+    <div class="ecr-preview"><span class="hdr">#~#
+EST_ID~#... &nbsp; EST_NAME~#{{ company_name }}
+MONTH~#{{ "%02d"|format(month) }} &nbsp; YEAR~#{{ year }} &nbsp; TOTAL_MEMBERS~#{{ results|length }}
+#~#</span>
+{% for r in results %}<span class="uan">{{ r.uan }}</span>~#{{ r.name }}~#{{ r.gross_earned|int }}~#{{ r.pf_wages|int }}~#{{ r.pf_wages|int }}~#{{ r.edli_wages|int }}~#{{ (r.employee_pf + r.employer_epf)|int }}~#{{ r.employer_eps|int }}~#{{ (r.employee_pf + r.employer_epf - r.employer_eps)|int }}~#{{ r.ncp_days }}~#0
+{% endfor %}</div>
+  </div>
+
+  <!-- Challan Confirmation CTA -->
+  <div class="challan-cta">
+    <div class="text">
+      <h3>📨 Ready to share Challan Confirmation with your employer?</h3>
+      <p>Generate the final consolidated challan statement — PF + ESIC + PT + LWF — ready to print and share.</p>
+    </div>
+    <a href="/challan-confirmation/{{ session_id }}" class="btn-confirm">📋 View Challan Confirmation →</a>
+  </div>
+
+</div>
+
+<footer>CPS LLP — Corporate Personnel Services LLP · cpsllpgroup.com · {{ month_name }} {{ year }}</footer>
+</body>
+</html>

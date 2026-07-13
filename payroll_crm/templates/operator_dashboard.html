@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Operator Dashboard</h1>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ clients | length }}</div>
+    <div class="stat-label">Total Clients</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ runs_this_month }}</div>
+    <div class="stat-label">Runs This Month</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ recent_runs | selectattr("status", "equalto", "draft") | list | length }}</div>
+    <div class="stat-label">Pending Approvals</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ recent_runs | length }}</div>
+    <div class="stat-label">Recent Runs</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Recent Runs</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Client</th>
+        <th>Month/Year</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for run in recent_runs %}
+      <tr>
+        <td>{{ run.client.name if run.client else run.client_id }}</td>
+        <td>{{ run.month }}/{{ run.year }}</td>
+        <td><span class="badge badge-{{ run.status }}">{{ run.status }}</span></td>
+        <td><a href="/client/review/{{ run.id }}">Review</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No runs yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p><a href="/operator/clients">Manage Clients</a></p>
+{% endblock %}

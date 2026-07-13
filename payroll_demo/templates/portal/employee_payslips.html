@@ -1,0 +1,102 @@
+{% extends "portal/base.html" %}
+{% block title %}My Payslips — {{ user.name }}{% endblock %}
+{% block page_title %}My Payslips{% endblock %}
+{% block page_subtitle %}All salary statements issued by {{ company.name }} via CPS LLP{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/employee" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    My Dashboard
+  </a>
+  <a href="/portal/employee/payslips" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    My Payslips
+  </a>
+  <a href="/portal/employee/ytd" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    YTD Summary
+  </a>
+{% endblock %}
+
+{% block content %}
+
+{% if slips %}
+  <!-- Year grouping -->
+  {% set years = slips | map(attribute='year') | unique | list %}
+  {% for year in years %}
+    <div class="mb-8">
+      <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">FY {{ year }}–{{ year + 1 - 2000 }}</h3>
+      <div class="grid grid-cols-3 gap-4">
+        {% for slip in slips if slip.year == year %}
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
+          <!-- Header strip -->
+          <div class="h-2 bg-gradient-to-r from-navy-800 to-navy-600"></div>
+          <div class="p-5">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <p class="font-bold text-gray-900 text-base">{{ month_names[slip.month] }} {{ slip.year }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ company.name }}</p>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="space-y-1.5 mb-4">
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Employee ID</span>
+                <span class="font-medium text-gray-800">{{ user.emp_id }}</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Designation</span>
+                <span class="font-medium text-gray-800 text-right max-w-[120px] truncate">{{ user.designation }}</span>
+              </div>
+              <div class="flex justify-between text-xs">
+                <span class="text-gray-500">Department</span>
+                <span class="font-medium text-gray-800">{{ user.department }}</span>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-gray-100">
+              <a href="/portal/download/{{ slip.id }}"
+                class="flex items-center justify-center gap-2 w-full py-2.5 bg-navy-800 hover:bg-navy-700
+                       text-white text-xs font-bold rounded-xl transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Download Salary Slip (PDF)
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+
+  <!-- Note -->
+  <div class="flex items-start gap-3 p-4 bg-slate-100 rounded-xl text-xs text-gray-500 border border-gray-200">
+    <svg class="w-4 h-4 flex-shrink-0 mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span>
+      Salary slips are generated and digitally signed by <strong>Corporate Personnel Services LLP</strong>.
+      For queries or discrepancies, contact your HR or write to
+      <strong>payroll@cpsllpgroup.com</strong>.
+      Form 16 (TDS certificate) for FY 2024–25 will be available by June 15, 2025.
+    </span>
+  </div>
+
+{% else %}
+  <div class="text-center py-24 text-gray-400">
+    <svg class="w-14 h-14 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    <p class="font-semibold text-gray-500">No payslips yet</p>
+    <p class="text-sm mt-1">Your salary slips will appear here once payroll is processed by CPS LLP</p>
+  </div>
+{% endif %}
+
+{% endblock %}

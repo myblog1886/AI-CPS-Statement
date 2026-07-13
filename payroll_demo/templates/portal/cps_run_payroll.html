@@ -1,0 +1,151 @@
+{% extends "portal/base.html" %}
+
+{% block title %}Run Payroll — CPS Admin{% endblock %}
+{% block page_title %}Run Payroll{% endblock %}
+{% block page_subtitle %}Upload employee data to process a new payroll cycle{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/cps" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+    </svg>
+    Dashboard
+  </a>
+  <a href="/portal/cps/run-payroll" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    Run Payroll
+  </a>
+  <a href="#" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+    </svg>
+    Clients
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+  <form method="POST" action="/portal/cps/run-payroll" enctype="multipart/form-data" class="space-y-6">
+
+    <!-- Client & Period -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-50 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-navy-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+          </svg>
+          Client &amp; Pay Period
+        </h3>
+      </div>
+      <div class="px-6 py-5 grid grid-cols-2 gap-5">
+        <div class="col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Client Company</label>
+          <select name="company_id" required
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900
+                   focus:outline-none focus:ring-2 focus:ring-navy-600 text-sm">
+            {% for c in companies %}
+              <option value="{{ c.id }}">{{ c.name }} ({{ c.establishment_id }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Month</label>
+          <select name="month" required
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900
+                   focus:outline-none focus:ring-2 focus:ring-navy-600 text-sm">
+            {% for i in range(1, 13) %}
+              <option value="{{ i }}" {% if i == 4 %}selected{% endif %}>{{ month_names[i] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+          <select name="year" required
+            class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-900
+                   focus:outline-none focus:ring-2 focus:ring-navy-600 text-sm">
+            <option value="2025" selected>2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- File upload -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-50 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800 flex items-center gap-2">
+          <svg class="w-4 h-4 text-navy-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          Employee Data File
+        </h3>
+      </div>
+      <div class="px-6 py-5">
+        <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 hover:border-navy-400 transition"
+               id="drop-zone">
+          <div class="text-center" id="drop-label">
+            <svg class="mx-auto w-10 h-10 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            <p class="text-sm font-medium text-gray-700">Drop your CSV or Excel file here</p>
+            <p class="text-xs text-gray-400 mt-1">or click to browse — .csv / .xlsx supported</p>
+          </div>
+          <input type="file" name="file" id="file-input" accept=".csv,.xlsx,.xls" required class="hidden"/>
+        </label>
+
+        <!-- Column guide -->
+        <div class="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-100">
+          <p class="text-xs font-semibold text-blue-700 mb-2">Accepted columns (flexible naming):</p>
+          <div class="grid grid-cols-3 gap-1 text-xs text-blue-600">
+            <span>• emp_id / employee_code</span><span>• name / employee_name</span>
+            <span>• basic / basic_salary</span><span>• da / dearness_allowance</span>
+            <span>• hra / house_rent</span><span>• other / special_allowance</span>
+            <span>• days_worked / present_days</span><span>• uan / uan_number</span>
+            <span>• bank_account / acc_no</span>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center gap-3">
+          <a href="/sample-csv" class="text-xs text-navy-800 font-semibold underline hover:text-navy-600">
+            ↓ Download sample CSV
+          </a>
+          <span class="text-gray-300">|</span>
+          <span class="text-xs text-gray-400">Auto-detects column variations, handles missing fields gracefully</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Audit note -->
+    <div class="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-200">
+      <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/>
+      </svg>
+      <div>
+        <p class="text-sm font-semibold text-amber-800">Audit Check Included</p>
+        <p class="text-xs text-amber-700 mt-0.5">The engine automatically validates PF/ESIC wage caps, flags NCP days, and checks for gross vs statutory deduction anomalies before generating files.</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button type="submit"
+        class="px-8 py-3 bg-navy-800 text-white font-bold rounded-xl hover:bg-navy-700 transition shadow-lg text-sm">
+        Process Payroll →
+      </button>
+      <a href="/portal/cps" class="text-sm text-gray-500 hover:text-gray-700 transition">Cancel</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  const input = document.getElementById('file-input');
+  const label = document.getElementById('drop-label');
+  input.addEventListener('change', () => {
+    if (input.files.length) {
+      label.innerHTML = `<p class="text-sm font-semibold text-green-700">✓ ${input.files[0].name}</p><p class="text-xs text-gray-500 mt-1">${(input.files[0].size/1024).toFixed(1)} KB — ready to process</p>`;
+    }
+  });
+</script>
+{% endblock %}

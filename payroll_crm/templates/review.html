@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Review Run #{{ run.id }}{% endblock %}
+{% block content %}
+<h1>Payroll Review — Run #{{ run.id }}</h1>
+<p>Month: {{ run.month }} / {{ run.year }} &nbsp;|&nbsp; Status: <span class="badge badge-{{ run.status }}">{{ run.status }}</span></p>
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Gross Payroll</div>
+    <div class="stat-value">₹{{ "%.2f"|format(total_gross) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Net Payroll</div>
+    <div class="stat-value">₹{{ "%.2f"|format(total_net) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total PF (Employer)</div>
+    <div class="stat-value">₹{{ "%.2f"|format(total_pf) }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Total ESIC (Employer)</div>
+    <div class="stat-value">₹{{ "%.2f"|format(total_esic) }}</div>
+  </div>
+</div>
+
+<h2>Compliance Findings</h2>
+{% if fail_count > 0 %}
+<div class="alert alert-error">
+  ⚠ {{ fail_count }} compliance issue(s) must be resolved before approval.
+</div>
+{% endif %}
+
+{% if compliance_findings %}
+<div class="review-grid">
+  {% for f in compliance_findings %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <strong>{{ f.act }} — {{ f.section }}</strong>
+      <span class="badge {% if f.status == 'fail' %}badge-error{% elif f.status == 'partial' %}badge-draft{% else %}badge-approved{% endif %}">
+        {{ f.status }}
+      </span>
+    </div>
+    <p>{{ f.reason }}</p>
+    {% if f.next_steps %}<p><em>Next steps: {{ f.next_steps }}</em></p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p>No compliance findings.</p>
+{% endif %}
+
+<h2>Payroll Detail</h2>
+{% if payroll_results %}
+<table class="table">
+  <thead>
+    <tr>
+      <th>Employee</th>
+      <th>Basic</th>
+      <th>Gross</th>
+      <th>Employee PF</th>
+      <th>Employer PF</th>
+      <th>ESIC</th>
+      <th>PT</th>
+      <th>Net Salary</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in payroll_results %}
+    <tr>
+      <td>{{ r.name }}</td>
+      <td>₹{{ "%.2f"|format(r.basic) }}</td>
+      <td>₹{{ "%.2f"|format(r.gross_salary) }}</td>
+      <td>₹{{ "%.2f"|format(r.employee_pf) }}</td>
+      <td>₹{{ "%.2f"|format(r.employer_pf) }}</td>
+      <td>₹{{ "%.2f"|format(r.employer_esic) }}</td>
+      <td>₹{{ "%.2f"|format(r.pt) }}</td>
+      <td>₹{{ "%.2f"|format(r.net_salary) }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No payroll records.</p>
+{% endif %}
+
+<h2>Edit</h2>
+<div class="card">
+  <h3>Text Edit</h3>
+  <form method="post" action="/client/edit/text/{{ run.id }}">
+    <div class="form-group">
+      <label for="instruction">Instruction</label>
+      <textarea name="instruction" id="instruction" rows="3" placeholder="e.g. Give Alice a 10% bonus"></textarea>
+    </div>
+    <button type="submit" class="btn">Re-run with edit</button>
+  </form>
+</div>
+
+<div class="card" style="margin-top:1rem;">
+  <h3>Re-upload</h3>
+  <a href="/client/upload?client_id={{ run.client_id }}&parent_run_id={{ run.id }}" class="btn">Upload new file</a>
+</div>
+
+<h2>Approve</h2>
+<div class="card">
+  {% if not can_approve %}
+  <p>Approval is blocked due to failing compliance checks.</p>
+  <button class="btn" disabled>Approve</button>
+  {% else %}
+    {% if partial_count > 0 %}
+    <label>
+      <input type="checkbox" id="ack-checkbox">
+      I acknowledge the partial compliance findings
+    </label>
+    <br><br>
+    {% endif %}
+    <form method="post" action="/client/approve/{{ run.id }}" id="approve-form">
+      <button type="submit" class="btn" id="approve-btn" {% if partial_count > 0 %}disabled{% endif %}>Approve</button>
+    </form>
+  {% endif %}
+</div>
+
+{% if partial_count > 0 and can_approve %}
+<script>
+  const checkbox = document.getElementById('ack-checkbox');
+  const approveBtn = document.getElementById('approve-btn');
+  checkbox.addEventListener('change', () => {
+    approveBtn.disabled = !checkbox.checked;
+  });
+</script>
+{% endif %}
+{% endblock %}

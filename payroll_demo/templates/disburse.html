@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salary Disbursement — {{ company_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0f2f8; color: #1a1a1a; min-height: 100vh; }
+
+  nav {
+    background: #243673; color: white; padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo-box { background: #3b4fe4; font-family: 'Poppins',sans-serif; font-weight: 800; font-size: 1rem; padding: .3rem .7rem; border-radius: 6px; margin-right: .8rem; }
+  nav .brand-text { font-family: 'Poppins',sans-serif; font-weight: 600; font-size: 1rem; }
+  nav a.back { color: rgba(255,255,255,.8); text-decoration: none; font-size: .83rem; }
+  nav a.back:hover { color: white; text-decoration: underline; }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; }
+
+  /* ── How it works banner ── */
+  .how-it-works {
+    background: white; border-radius: 14px; padding: 1.4rem 2rem;
+    box-shadow: 0 2px 12px rgba(36,54,115,.09); margin-bottom: 1.4rem;
+  }
+  .how-it-works h2 { font-family: 'Poppins',sans-serif; font-size: .95rem; font-weight: 700; color: #243673; margin-bottom: 1rem; }
+  .steps { display: flex; align-items: flex-start; gap: 0; }
+  .step { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute; top: 18px; left: 60%; width: 80%; height: 2px;
+    background: linear-gradient(90deg, #3b4fe4, #a5b4fc);
+  }
+  .step-icon {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #eef0ff; border: 2px solid #3b4fe4;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; position: relative; z-index: 1;
+  }
+  .step-title { font-family: 'Poppins',sans-serif; font-size: .72rem; font-weight: 700; color: #243673; margin-top: .4rem; }
+  .step-desc  { font-size: .68rem; color: #6e7180; margin-top: .15rem; line-height: 1.4; max-width: 110px; }
+
+  /* ── Config + totals row ── */
+  .top-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.4rem; }
+
+  .config-card, .totals-card {
+    background: white; border-radius: 14px; padding: 1.3rem 1.5rem;
+    box-shadow: 0 2px 12px rgba(36,54,115,.09);
+  }
+  .config-card h3, .totals-card h3 {
+    font-family: 'Poppins',sans-serif; font-size: .88rem; font-weight: 700;
+    color: #243673; margin-bottom: 1rem; padding-bottom: .5rem;
+    border-bottom: 2px solid #eef0ff;
+  }
+
+  .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .cfg-group { display: flex; flex-direction: column; gap: .3rem; }
+  .cfg-group label { font-family: 'Poppins',sans-serif; font-size: .72rem; font-weight: 600; color: #6e7180; text-transform: uppercase; letter-spacing: .05em; }
+  .cfg-group select, .cfg-group input {
+    padding: .45rem .7rem; border: 1.5px solid #e2e5e7; border-radius: 7px;
+    font-size: .82rem; font-family: 'Open Sans',sans-serif; color: #1a1a1a;
+    outline: none; transition: border .15s;
+  }
+  .cfg-group select:focus, .cfg-group input:focus { border-color: #3b4fe4; }
+
+  .totals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+  .tot { background: #f8f9ff; border-radius: 8px; padding: .6rem .8rem; }
+  .tot .tl { font-size: .7rem; color: #6e7180; font-family: 'Poppins',sans-serif; font-weight: 600; }
+  .tot .tv { font-family: 'Poppins',sans-serif; font-size: 1.1rem; font-weight: 800; color: #243673; margin-top: .1rem; }
+  .tot.highlight { background: #eef0ff; }
+  .tot.highlight .tv { color: #3b4fe4; }
+
+  /* ── Run button ── */
+  .run-bar { display: flex; gap: 1rem; align-items: center; margin-bottom: 1.4rem; flex-wrap: wrap; }
+  .btn-disburse {
+    padding: .75rem 2rem; background: linear-gradient(135deg, #243673, #3b4fe4);
+    color: white; border: none; border-radius: 10px;
+    font-family: 'Poppins',sans-serif; font-size: .95rem; font-weight: 700;
+    cursor: pointer; transition: opacity .15s, transform .1s;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .btn-disburse:hover { opacity: .92; transform: translateY(-1px); }
+  .btn-disburse:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+  .disclaimer-note {
+    font-size: .75rem; color: #6e7180; max-width: 500px; line-height: 1.5;
+    background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
+    padding: .5rem .8rem;
+  }
+
+  /* ── Progress bar ── */
+  .progress-wrap { margin-bottom: 1.4rem; display: none; }
+  .progress-wrap.visible { display: block; }
+  .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+  .progress-header .plabel { font-family: 'Poppins',sans-serif; font-size: .82rem; font-weight: 700; color: #243673; }
+  .progress-header .pcount { font-size: .78rem; color: #6e7180; }
+  .progress-track {
+    height: 10px; background: #e2e5e7; border-radius: 999px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, #3b4fe4, #059669);
+    border-radius: 999px; width: 0%; transition: width .4s ease;
+  }
+  .progress-stats {
+    display: flex; gap: 2rem; margin-top: .6rem; font-size: .78rem;
+  }
+  .ps { display: flex; align-items: center; gap: .35rem; }
+  .ps .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .ps.success .dot { background: #059669; }
+  .ps.failed  .dot { background: #dc2626; }
+  .ps.pending .dot { background: #e2e5e7; border: 1px solid #9ca3af; }
+  .ps span { font-weight: 600; color: #374151; }
+
+  /* ── Transaction table ── */
+  .table-card {
+    background: white; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(36,54,115,.09); margin-bottom: 1.4rem;
+  }
+  .table-card .tc-header {
+    padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .table-card .tc-header h3 { font-family: 'Poppins',sans-serif; font-size: .9rem; font-weight: 700; color: #243673; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  thead tr { background: #243673; color: white; }
+  thead th { padding: .65rem .8rem; text-align: left; font-family: 'Poppins',sans-serif; font-weight: 600; font-size: .74rem; white-space: nowrap; }
+  thead th.r { text-align: right; }
+  tbody td { padding: .6rem .8rem; border-bottom: 1px solid #f3f4f6; }
+  tbody td.r { text-align: right; }
+  tbody tr:last-child td { border: none; }
+  tbody tr:nth-child(even) { background: #f8f9ff; }
+
+  .emp-id   { font-family: 'Poppins',sans-serif; font-weight: 700; color: #3b4fe4; font-size: .74rem; }
+  .emp-name { font-weight: 600; }
+  .acc-no   { font-family: 'JetBrains Mono',monospace; font-size: .75rem; color: #374151; }
+  .amount   { font-family: 'Poppins',sans-serif; font-weight: 700; color: #243673; }
+
+  /* Status pill */
+  .status-pill {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .2rem .65rem; border-radius: 999px;
+    font-family: 'Poppins',sans-serif; font-size: .7rem; font-weight: 700;
+    white-space: nowrap;
+  }
+  .status-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  .pill-pending { background: #f3f4f6; color: #6e7180; }
+  .pill-pending .dot { background: #9ca3af; }
+
+  .pill-processing { background: #eff6ff; color: #1d4ed8; }
+  .pill-processing .dot { background: #3b82f6; animation: pulse 1s infinite; }
+
+  .pill-success { background: #dcfce7; color: #166534; }
+  .pill-success .dot { background: #22c55e; }
+
+  .pill-failed { background: #fee2e2; color: #b91c1c; }
+  .pill-failed .dot { background: #ef4444; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  .utr-code { font-family: 'JetBrains Mono',monospace; font-size: .72rem; color: #059669; }
+
+  /* ── Summary bar after completion ── */
+  .completion-bar {
+    display: none; background: linear-gradient(135deg, #166534, #15803d);
+    border-radius: 14px; padding: 1.3rem 2rem; color: white;
+    align-items: center; justify-content: space-between; gap: 1rem;
+    margin-bottom: 1.4rem; flex-wrap: wrap;
+  }
+  .completion-bar.visible { display: flex; }
+  .completion-bar .cb-left h3 { font-family: 'Poppins',sans-serif; font-size: 1rem; font-weight: 800; }
+  .completion-bar .cb-left p  { font-size: .8rem; opacity: .85; margin-top: .2rem; }
+  .completion-bar .cb-amount  { font-family: 'Poppins',sans-serif; font-size: 2rem; font-weight: 800; }
+
+  /* ── Competitor callout ── */
+  .competitor-box {
+    background: #243673; color: white; border-radius: 14px;
+    padding: 1.4rem 1.8rem; margin-bottom: 1.4rem;
+  }
+  .competitor-box h3 { font-family: 'Poppins',sans-serif; font-size: .9rem; font-weight: 700; margin-bottom: .9rem; opacity: .9; }
+  .comp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+  .comp-item { background: rgba(255,255,255,.08); border-radius: 10px; padding: .8rem 1rem; }
+  .comp-item .ci-name { font-family: 'Poppins',sans-serif; font-size: .78rem; font-weight: 700; color: #a5b4fc; }
+  .comp-item .ci-method { font-size: .72rem; color: rgba(255,255,255,.7); margin-top: .25rem; line-height: 1.4; }
+  .comp-item .ci-limit { font-size: .68rem; color: rgba(255,255,255,.5); margin-top: .2rem; }
+
+  footer { background: #243673; color: rgba(255,255,255,.6); text-align: center; font-size: .76rem; padding: 1.2rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center">
+    <div class="logo-box">CPS</div>
+    <div class="brand-text">Corporate Personnel Services LLP — Salary Disbursement</div>
+  </div>
+  <a href="/download/all-slips/{{ session_id }}" class="back">⬅ Back to Results</a>
+</nav>
+
+<div class="page">
+
+  <!-- ── How it works ── -->
+  <div class="how-it-works">
+    <h2>🏦 How Direct Salary Disbursement Works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">📋</div>
+        <div class="step-title">Payroll Computed</div>
+        <div class="step-desc">Net pay calculated per employee after all statutory deductions</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">✅</div>
+        <div class="step-title">Authorise Run</div>
+        <div class="step-desc">Employer approves batch; funds debited from company account</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">🔀</div>
+        <div class="step-title">API Call</div>
+        <div class="step-desc">CPS platform calls bank Payouts API (RazorpayX / Cashfree / YES Bank)</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">⚡</div>
+        <div class="step-title">IMPS / NEFT</div>
+        <div class="step-desc">Funds transferred to each employee's bank account in real time</div>
+      </div>
+      <div class="step">
+        <div class="step-icon">📨</div>
+        <div class="step-title">UTR + Slip</div>
+        <div class="step-desc">Each employee gets UTR reference & salary slip via email/SMS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Competitor context ── -->
+  <div class="competitor-box">
+    <h3>💡 How Competing Payroll Platforms Handle Direct Disbursement</h3>
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="ci-name">Razorpay Payroll</div>
+        <div class="ci-method">Uses RazorpayX Payouts API — IMPS/NEFT batch with real-time status webhook. Native banking rails, no separate bank integration needed.</div>
+        <div class="ci-limit">Limit: ₹2L per txn via IMPS; NEFT for higher amounts</div>
+      </div>
+      <div class="comp-item">
+        <div class="ci-name">Greythr / Keka</div>
+        <div class="ci-method">Generates bank-specific payment files (SBI, HDFC, ICICI, Axis formats). Employer uploads to net banking portal manually. No real-time status.</div>
+        <div class="ci-limit">Manual upload step required; no API-based transfer</div>
+      </div>
+      <div class="comp-item">
+        <div class="ci-name">Zoho Payroll</div>
+        <div class="ci-method">Integrates with Zoho Books / ICICI Bank directly. Auto-debit from linked current account on salary date. Email confirmation sent.</div>
+        <div class="ci-limit">Only ICICI Bank direct debit supported natively</div>
+      </div>
+      <div class="comp-item">
+        <div class="ci-name">Cashfree Payouts</div>
+        <div class="ci-method">Batch Payouts API with IMPS/NEFT/UPI. Per-transaction webhook, instant UTR. Used by several HR SaaS providers as white-label.</div>
+        <div class="ci-limit">Best-in-class API; UPI support up to ₹1L</div>
+      </div>
+      <div class="comp-item">
+        <div class="ci-name">Darwinbox</div>
+        <div class="ci-method">Bank-agnostic file generation + direct integration with Yes Bank CMS and HDFC SmartPay for enterprise clients.</div>
+        <div class="ci-limit">Enterprise-only; requires bank partnership setup</div>
+      </div>
+      <div class="comp-item">
+        <div class="ci-name">CPS LLP Copilot</div>
+        <div class="ci-method">Simulated below — in production connects to RazorpayX / Cashfree Payouts API. Real-time per-employee status stream with UTR generation.</div>
+        <div class="ci-limit" style="color:#86efac;font-weight:600">✓ API-ready · Any bank · Real-time</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Config + totals ── -->
+  <div class="top-row">
+    <div class="config-card">
+      <h3>⚙️ Disbursement Configuration</h3>
+      <div class="config-grid">
+        <div class="cfg-group">
+          <label>Payment Rail</label>
+          <select id="paymentRail">
+            <option value="IMPS">IMPS — Instant (24×7, up to ₹5L)</option>
+            <option value="NEFT">NEFT — Batch (hourly, no limit)</option>
+            <option value="UPI">UPI — Instant (up to ₹1L)</option>
+          </select>
+        </div>
+        <div class="cfg-group">
+          <label>Payout Partner</label>
+          <select id="payoutPartner">
+            <option>RazorpayX Payouts API</option>
+            <option>Cashfree Payouts</option>
+            <option>YES Bank CMS</option>
+            <option>HDFC SmartPay</option>
+          </select>
+        </div>
+        <div class="cfg-group">
+          <label>Debit Account</label>
+          <input type="text" value="CPS/OPS Current A/C ••••4821" readonly style="background:#f8f9ff">
+        </div>
+        <div class="cfg-group">
+          <label>Salary Date</label>
+          <input type="text" value="{{ month_name }} {{ year }} Payroll" readonly style="background:#f8f9ff">
+        </div>
+      </div>
+    </div>
+    <div class="totals-card">
+      <h3>📊 Disbursement Summary</h3>
+      <div class="totals-grid">
+        <div class="tot"><div class="tl">Employees</div><div class="tv">{{ results|length }}</div></div>
+        <div class="tot highlight"><div class="tl">Total to Disburse</div><div class="tv">₹{{ "{:,.0f}".format(summary.total_net) }}</div></div>
+        <div class="tot"><div class="tl">With Bank Details</div><div class="tv" id="bankCount">—</div></div>
+        <div class="tot"><div class="tl">Missing Bank Info</div><div class="tv" id="missingCount">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Run button ── -->
+  <div class="run-bar">
+    <button class="btn-disburse" id="disburseBtn" onclick="startDisbursement()">
+      <span id="btnIcon">🚀</span>
+      <span id="btnText">Authorise & Disburse Salaries</span>
+    </button>
+    <div class="disclaimer-note">
+      ⚠️ <strong>Demo mode:</strong> No real money moves. In production this triggers your configured
+      bank Payouts API with the exact same flow shown below.
+    </div>
+  </div>
+
+  <!-- ── Progress ── -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-header">
+      <span class="plabel" id="progressLabel">Initiating transfers…</span>
+      <span class="pcount" id="progressCount">0 / {{ results|length }}</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-stats">
+      <div class="ps success"><div class="dot"></div><span id="successCount">0</span> succeeded</div>
+      <div class="ps failed"> <div class="dot"></div><span id="failedCount">0</span> failed</div>
+      <div class="ps pending"><div class="dot"></div><span id="pendingCount">{{ results|length }}</span> pending</div>
+    </div>
+  </div>
+
+  <!-- ── Completion banner ── -->
+  <div class="completion-bar" id="completionBar">
+    <div class="cb-left">
+      <h3>✅ Disbursement Complete — {{ month_name }} {{ year }}</h3>
+      <p id="completionSubtext">All transfers processed. Employees notified via SMS/email.</p>
+    </div>
+    <div class="cb-amount" id="completionAmount">₹0</div>
+  </div>
+
+  <!-- ── Transaction table ── -->
+  <div class="table-card">
+    <div class="tc-header">
+      <h3>📡 Live Transfer Status</h3>
+      <span id="tableStatus" style="font-size:.76rem;color:#6e7180">Waiting to start…</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Bank Account</th>
+          <th>IFSC</th>
+          <th class="r">Net Pay (₹)</th>
+          <th>Payment Rail</th>
+          <th>Status</th>
+          <th>UTR Reference</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="txnBody">
+        {% for r in results %}
+        <tr id="row-{{ loop.index0 }}">
+          <td>
+            <div class="emp-id">{{ r.emp_id }}</div>
+            <div class="emp-name">{{ r.name }}</div>
+          </td>
+          <td class="acc-no">{{ r.bank_account if r.bank_account and r.bank_account not in ('nan','None','') else '⚠ Missing' }}</td>
+          <td class="acc-no" style="font-size:.72rem">{{ r.ifsc_code if r.ifsc_code and r.ifsc_code not in ('nan','None','') else '—' }}</td>
+          <td class="r amount">{{ "{:,.0f}".format(r.net_pay) }}</td>
+          <td id="rail-{{ loop.index0 }}" style="font-size:.75rem;color:#6e7180">—</td>
+          <td id="status-{{ loop.index0 }}">
+            <span class="status-pill pill-pending"><div class="dot"></div>Pending</span>
+          </td>
+          <td id="utr-{{ loop.index0 }}" class="utr-code" style="color:#9ca3af">—</td>
+          <td id="time-{{ loop.index0 }}" style="font-size:.72rem;color:#9ca3af">—</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /page -->
+
+<footer>CPS LLP — Corporate Personnel Services LLP · cpsllpgroup.com · {{ month_name }} {{ year }}</footer>
+
+<script>
+  const TOTAL = {{ results|length }};
+  const SESSION = "{{ session_id }}";
+  let successCount = 0, failedCount = 0;
+
+  // Count bank details on load
+  document.addEventListener('DOMContentLoaded', () => {
+    let withBank = 0;
+    document.querySelectorAll('td.acc-no').forEach((td, i) => {
+      if (i % 2 === 0 && !td.textContent.includes('Missing')) withBank++;
+    });
+    // simpler: count from rows
+    const rows = document.querySelectorAll('#txnBody tr');
+    let bc = 0;
+    rows.forEach(r => {
+      const acc = r.querySelector('td.acc-no');
+      if (acc && !acc.textContent.includes('Missing')) bc++;
+    });
+    document.getElementById('bankCount').textContent = bc;
+    document.getElementById('missingCount').textContent = TOTAL - bc;
+  });
+
+  function fmtTime() {
+    return new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }
+
+  function startDisbursement() {
+    const btn = document.getElementById('disburseBtn');
+    btn.disabled = true;
+    document.getElementById('btnIcon').textContent = '⏳';
+    document.getElementById('btnText').textContent = 'Disbursing…';
+    document.getElementById('progressWrap').classList.add('visible');
+    document.getElementById('tableStatus').textContent = 'Transfers in progress…';
+
+    const rail = document.getElementById('paymentRail').value;
+    let done = 0;
+
+    const es = new EventSource(`/disburse/status/${SESSION}`);
+
+    es.onmessage = (e) => {
+      const d = JSON.parse(e.data);
+      done++;
+
+      // Update row status
+      const statusCell = document.getElementById(`status-${d.index}`);
+      const railCell   = document.getElementById(`rail-${d.index}`);
+      const utrCell    = document.getElementById(`utr-${d.index}`);
+      const timeCell   = document.getElementById(`time-${d.index}`);
+      const row        = document.getElementById(`row-${d.index}`);
+
+      railCell.textContent = rail;
+      timeCell.textContent = fmtTime();
+
+      if (d.status === 'SUCCESS') {
+        successCount++;
+        statusCell.innerHTML = `<span class="status-pill pill-success"><div class="dot"></div>Success</span>`;
+        utrCell.textContent = d.utr;
+        utrCell.style.color = '';
+        row.style.transition = 'background .4s';
+        row.style.background = '#f0fdf4';
+        setTimeout(() => row.style.background = '', 1500);
+      } else {
+        failedCount++;
+        statusCell.innerHTML = `<span class="status-pill pill-failed"><div class="dot"></div>Failed</span>`;
+        utrCell.textContent = 'Bank rejected';
+        utrCell.style.color = '#dc2626';
+        row.style.background = '#fff5f5';
+      }
+
+      // Update progress
+      const pct = (done / TOTAL) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressCount').textContent = `${done} / ${TOTAL}`;
+      document.getElementById('progressLabel').textContent =
+        done === TOTAL ? 'All transfers processed' : `Processing transfer ${done} of ${TOTAL}…`;
+      document.getElementById('successCount').textContent = successCount;
+      document.getElementById('failedCount').textContent  = failedCount;
+      document.getElementById('pendingCount').textContent = TOTAL - done;
+
+      if (d.done || done >= TOTAL) {
+        es.close();
+        document.getElementById('tableStatus').textContent = `Completed at ${fmtTime()}`;
+        document.getElementById('btnIcon').textContent = '✅';
+        document.getElementById('btnText').textContent = 'Disbursement Complete';
+
+        // Show completion banner
+        const bar = document.getElementById('completionBar');
+        bar.classList.add('visible');
+        document.getElementById('completionAmount').textContent =
+          '₹' + d.total_sent.toLocaleString('en-IN');
+        const sub = failedCount > 0
+          ? `${successCount} succeeded · ${failedCount} failed — retry failed transfers manually.`
+          : `All ${successCount} transfers successful. Employees notified.`;
+        document.getElementById('completionSubtext').textContent = sub;
+        if (failedCount > 0) {
+          bar.style.background = 'linear-gradient(135deg,#92400e,#d97706)';
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+      document.getElementById('tableStatus').textContent = 'Connection error — refresh and retry.';
+    };
+  }
+</script>
+</body>
+</html>

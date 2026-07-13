@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll Results — {{ company_name }} — New Labour Codes</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0faf9; min-height: 100vh; color: #1a1a1a; }
+
+  nav {
+    background: #0f766e; color: white;
+    padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .brand { display: flex; align-items: center; gap: .8rem; }
+  nav .logo-box {
+    background: #14b8a6; font-family: 'Poppins', sans-serif;
+    font-weight: 800; font-size: .85rem; padding: .3rem .65rem; border-radius: 6px;
+    white-space: nowrap;
+  }
+  nav .brand-text { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: .95rem; }
+  nav a.back { color: rgba(255,255,255,.8); text-decoration: none; font-size: .82rem; }
+  nav a.back:hover { color: white; text-decoration: underline; }
+
+  .page { max-width: 1440px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; }
+
+  /* ── Company bar ── */
+  .company-bar {
+    background: white; border-radius: 12px; padding: 1rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(15,118,110,.08); margin-bottom: 1.2rem;
+    border-left: 5px solid #0f766e;
+  }
+  .company-bar h1 { font-family: 'Poppins', sans-serif; font-size: 1.1rem; color: #0f766e; font-weight: 800; }
+  .company-bar p  { font-size: .82rem; color: #6e7180; margin-top: .1rem; }
+  .period-badge {
+    background: #f0fdfa; border: 1.5px solid #5eead4; color: #0f766e;
+    padding: .4rem 1rem; border-radius: 999px;
+    font-family: 'Poppins', sans-serif; font-size: .83rem; font-weight: 700;
+  }
+
+  /* ── Compliance alert ── */
+  .compliance-alert {
+    border-radius: 12px; padding: 1rem 1.4rem; margin-bottom: 1.2rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .compliance-alert.has-critical { background: #fee2e2; border: 1.5px solid #fca5a5; }
+  .compliance-alert.has-warning  { background: #fffbeb; border: 1.5px solid #fcd34d; }
+  .compliance-alert.clean        { background: #f0fdfa; border: 1.5px solid #5eead4; }
+  .compliance-alert .alert-text h3 { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; }
+  .compliance-alert.has-critical .alert-text h3 { color: #991b1b; }
+  .compliance-alert.has-warning  .alert-text h3 { color: #78350f; }
+  .compliance-alert.clean        .alert-text h3 { color: #065f46; }
+  .compliance-alert .alert-text p { font-size: .82rem; color: #6e7180; margin-top: .2rem; }
+  .btn-compliance {
+    padding: .6rem 1.3rem; border-radius: 8px; font-family: 'Poppins', sans-serif;
+    font-size: .82rem; font-weight: 700; text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem; border: none; cursor: pointer; white-space: nowrap;
+  }
+  .btn-compliance.critical { background: #b91c1c; color: white; }
+  .btn-compliance.warning  { background: #d97706; color: white; }
+  .btn-compliance.clean    { background: #0f766e; color: white; }
+
+  /* ── Summary cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr)); gap: .9rem; margin-bottom: 1.2rem; }
+  .card {
+    background: white; border-radius: 12px; padding: 1rem 1.1rem;
+    box-shadow: 0 2px 10px rgba(15,118,110,.08);
+    border-top: 4px solid var(--accent);
+  }
+  .card .label { font-family: 'Poppins', sans-serif; font-size: .68rem; color: #6e7180; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .card .value { font-family: 'Poppins', sans-serif; font-size: 1.35rem; font-weight: 800; color: #1a1a1a; margin-top: .15rem; }
+  .card .sub   { font-size: .7rem; color: #9ca3af; margin-top: .1rem; }
+  .card.teal   { --accent: #0f766e; }
+  .card.green  { --accent: #059669; }
+  .card.red    { --accent: #dc2626; }
+  .card.amber  { --accent: #d97706; }
+  .card.purple { --accent: #7c3aed; }
+  .card.blue   { --accent: #2563eb; }
+  .card.navy   { --accent: #1e3a8a; }
+  .card.critical-card { --accent: #b91c1c; background: #fff5f5; }
+  .card.warn-card     { --accent: #d97706; background: #fffbeb; }
+
+  /* ── Download bar ── */
+  .dl-bar {
+    background: white; border-radius: 12px; padding: .9rem 1.4rem;
+    display: flex; align-items: center; gap: .7rem; flex-wrap: wrap;
+    box-shadow: 0 2px 10px rgba(15,118,110,.08); margin-bottom: 1.2rem;
+  }
+  .dl-bar span { font-family: 'Poppins', sans-serif; font-size: .82rem; font-weight: 700; color: #0f766e; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .42rem .9rem; border-radius: 8px; font-size: .77rem; font-weight: 600;
+    font-family: 'Poppins', sans-serif; text-decoration: none; border: 1.5px solid; transition: all .15s;
+  }
+  .btn:hover { transform: translateY(-1px); filter: brightness(.93); }
+  .btn-ecr     { background: #f0fdfa; color: #0f766e;  border-color: #5eead4; }
+  .btn-esic    { background: #eff6ff; color: #1d4ed8;  border-color: #93c5fd; }
+  .btn-zip     { background: #f5f3ff; color: #6d28d9;  border-color: #c4b5fd; }
+  .btn-bank    { background: #fffbeb; color: #92400e;  border-color: #fcd34d; }
+  .btn-reg     { background: #f0fdf4; color: #166534;  border-color: #86efac; }
+  .btn-comp    { background: #fee2e2; color: #991b1b;  border-color: #fca5a5; }
+
+  /* ── Employee table ── */
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .7rem; }
+  .section-head h2 { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; color: #0f766e; }
+
+  .table-wrap { background: white; border-radius: 12px; overflow: auto; box-shadow: 0 2px 10px rgba(15,118,110,.08); margin-bottom: 1.2rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .76rem; }
+  thead tr { background: #0f766e; color: white; }
+  thead th { padding: .6rem .65rem; text-align: right; font-family: 'Poppins', sans-serif; font-weight: 600; white-space: nowrap; }
+  thead th:first-child, thead th:nth-child(2) { text-align: left; }
+  tbody tr:nth-child(even) { background: #f0fdfa; }
+  tbody tr:hover { background: #ccfbf1; }
+  tbody td { padding: .55rem .65rem; border-bottom: 1px solid #f3f4f6; text-align: right; }
+  tbody td:first-child, tbody td:nth-child(2) { text-align: left; }
+  tbody tr:last-child td { border: none; }
+
+  .emp-id    { font-family: 'Poppins', sans-serif; font-weight: 700; color: #0f766e; }
+  .emp-name  { font-weight: 600; }
+  .emp-sub   { font-size: .7rem; color: #9ca3af; }
+  .gross     { font-weight: 700; }
+  .net       { font-weight: 800; color: #166534; background: #dcfce7 !important; }
+  .dedn      { color: #b91c1c; }
+  .na        { color: #9ca3af; font-style: italic; }
+
+  /* Tags */
+  .tag { padding: .1rem .4rem; border-radius: 4px; font-size: .66rem; font-weight: 700; display: inline-block; margin: .1rem .05rem 0; }
+  .tag-esic-yes  { background: #dcfce7; color: #166534; }
+  .tag-esic-no   { background: #f3f4f6; color: #9ca3af; }
+  .tag-fte       { background: #eff6ff; color: #1d4ed8; }
+  .tag-gig       { background: #f5f3ff; color: #6d28d9; }
+  .tag-regular   { background: #f0fdfa; color: #0f766e; }
+  .tag-critical  { background: #fee2e2; color: #991b1b; }
+  .tag-warning   { background: #fffbeb; color: #92400e; }
+  .tag-ok        { background: #dcfce7; color: #166534; }
+  .tag-pf-adj    { background: #fef3c7; color: #78350f; }
+  .tag-ot        { background: #eff6ff; color: #1e40af; }
+
+  .slip-btn {
+    display: inline-flex; align-items: center; gap: .2rem;
+    padding: .25rem .6rem; background: #0f766e; color: white;
+    border-radius: 6px; font-size: .7rem; font-weight: 600;
+    text-decoration: none; font-family: 'Poppins', sans-serif;
+  }
+  .slip-btn:hover { background: #0d5c56; }
+
+  /* ── Challan cards ── */
+  .challan-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+  @media (max-width: 900px) { .challan-grid { grid-template-columns: 1fr; } }
+  .challan-card {
+    background: white; border-radius: 12px; padding: 1.2rem 1.4rem;
+    box-shadow: 0 2px 10px rgba(15,118,110,.08);
+  }
+  .challan-card h3 {
+    font-family: 'Poppins', sans-serif; font-size: .9rem; font-weight: 700;
+    margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 2px solid;
+  }
+  .challan-card.pf   h3 { color: #0f766e; border-color: #5eead4; }
+  .challan-card.esic h3 { color: #1d4ed8; border-color: #93c5fd; }
+  .challan-card.other h3 { color: #d97706; border-color: #fcd34d; }
+  .challan-row { display: flex; justify-content: space-between; padding: .4rem 0; border-bottom: 1px solid #f3f4f6; font-size: .81rem; }
+  .challan-row:last-child { border: none; }
+  .challan-row .lbl { color: #6e7180; }
+  .challan-row .amt { font-weight: 700; }
+  .challan-total { display: flex; justify-content: space-between; padding: .5rem .8rem; border-radius: 8px; margin-top: .5rem; font-family: 'Poppins', sans-serif; font-size: .88rem; font-weight: 800; }
+  .challan-card.pf   .challan-total { background: #f0fdfa; color: #0f766e; }
+  .challan-card.esic .challan-total { background: #eff6ff; color: #1d4ed8; }
+  .challan-card.other .challan-total { background: #fffbeb; color: #d97706; }
+
+  /* ── Per-employee flags inline ── */
+  .flag-inline { font-size: .7rem; }
+  .fi-crit { color: #b91c1c; font-weight: 700; }
+  .fi-warn { color: #d97706; font-weight: 600; }
+  .fi-info { color: #0f766e; }
+
+  /* ── Gratuity / OT summary card ── */
+  .special-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+  .special-card { background: white; border-radius: 12px; padding: 1.2rem 1.4rem; box-shadow: 0 2px 10px rgba(15,118,110,.08); }
+  .special-card h3 { font-family: 'Poppins', sans-serif; font-size: .9rem; font-weight: 700; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 2px solid; }
+  .special-card.grat h3 { color: #7c3aed; border-color: #c4b5fd; }
+  .special-card.ot   h3 { color: #1d4ed8; border-color: #93c5fd; }
+  .special-row { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px solid #f3f4f6; font-size: .8rem; }
+  .special-row:last-child { border: none; }
+  .special-row .lbl { color: #6e7180; }
+  .special-row .amt { font-weight: 700; }
+
+  /* ── ECR Preview ── */
+  .ecr-wrap { background: white; border-radius: 12px; padding: 1.2rem 1.4rem; box-shadow: 0 2px 10px rgba(15,118,110,.08); margin-bottom: 1rem; }
+  .ecr-preview {
+    background: #1e293b; color: #94a3b8; border-radius: 10px;
+    padding: 1rem 1.2rem; font-family: 'Courier New', monospace; font-size: .75rem;
+    line-height: 1.7; overflow-x: auto; white-space: pre; margin-top: .7rem;
+  }
+  .ecr-preview .hdr { color: #f472b6; font-weight: bold; }
+  .ecr-preview .uan { color: #38bdf8; }
+
+  /* ── CTA ── */
+  .compliance-cta {
+    background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+    border-radius: 12px; padding: 1.4rem 1.8rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.2rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .compliance-cta .text h3 { font-family: 'Poppins', sans-serif; color: white; font-size: 1rem; font-weight: 700; }
+  .compliance-cta .text p  { color: rgba(255,255,255,.75); font-size: .82rem; margin-top: .2rem; }
+  .btn-confirm {
+    background: white; color: #0f766e; border: none;
+    padding: .7rem 1.5rem; border-radius: 8px; font-family: 'Poppins', sans-serif;
+    font-size: .88rem; font-weight: 700; text-decoration: none;
+    display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-confirm:hover { background: #f0fdfa; }
+
+  footer { background: #0f766e; color: rgba(255,255,255,.65); text-align: center; font-size: .76rem; padding: 1.5rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="logo-box">NEW LABOUR CODES</div>
+    <div class="brand-text">New Labour Codes Compliant Payroll</div>
+  </div>
+  <a href="/" class="back">← New Payroll Run</a>
+</nav>
+
+<div class="page">
+
+  <!-- Company bar -->
+  <div class="company-bar">
+    <div>
+      <h1>{{ company_name }}</h1>
+      <p>Payroll processed for <strong>{{ results|length }} employees</strong> under the New Labour Codes</p>
+    </div>
+    <div class="period-badge">📅 {{ month_name }} {{ year }}</div>
+  </div>
+
+  <!-- Compliance alert banner -->
+  {% if summary.compliance_critical > 0 %}
+  <div class="compliance-alert has-critical">
+    <div class="alert-text">
+      <h3>⚠️ {{ summary.compliance_critical }} Critical Compliance Issue{{ 's' if summary.compliance_critical > 1 else '' }} Found</h3>
+      <p>{{ summary.non_compliant_wage }} employee{{ 's' if summary.non_compliant_wage != 1 else '' }} have Basic+DA below 50% of CTC (Code on Wages violation). PF bases have been auto-corrected in this run.</p>
+    </div>
+    <a href="/compliance/{{ session_id }}" class="btn-compliance critical">📋 View Full Compliance Report →</a>
+  </div>
+  {% elif summary.compliance_warning > 0 %}
+  <div class="compliance-alert has-warning">
+    <div class="alert-text">
+      <h3>⚡ {{ summary.compliance_warning }} Warning{{ 's' if summary.compliance_warning > 1 else '' }} — Review Required</h3>
+      <p>No critical violations, but warnings exist (OT limits, ESIC boundary, leave caps). See compliance report.</p>
+    </div>
+    <a href="/compliance/{{ session_id }}" class="btn-compliance warning">📋 View Compliance Report →</a>
+  </div>
+  {% else %}
+  <div class="compliance-alert clean">
+    <div class="alert-text">
+      <h3>✅ All Employees Fully Compliant — New Labour Codes</h3>
+      <p>No wage ratio violations, OT breaches, or other compliance issues detected in this payroll run.</p>
+    </div>
+    <a href="/compliance/{{ session_id }}" class="btn-compliance clean">📋 View Compliance Report</a>
+  </div>
+  {% endif %}
+
+  <!-- Summary cards -->
+  <div class="cards">
+    <div class="card teal"><div class="label">Employees</div><div class="value">{{ summary.total_employees }}</div><div class="sub">{{ summary.esic_count }} ESIC eligible</div></div>
+    <div class="card green"><div class="label">Total Gross</div><div class="value">₹{{ "{:,.0f}".format(summary.total_gross) }}</div><div class="sub">+ OT ₹{{ "{:,.0f}".format(summary.total_ot_pay) }}</div></div>
+    <div class="card teal"><div class="label">Total Net Pay</div><div class="value">₹{{ "{:,.0f}".format(summary.total_net) }}</div><div class="sub">Take-home all employees</div></div>
+    <div class="card red"><div class="label">PF Challan</div><div class="value">₹{{ "{:,.0f}".format(summary.total_pf_challan) }}</div><div class="sub">New wages base applied</div></div>
+    <div class="card blue"><div class="label">ESIC Challan</div><div class="value">₹{{ "{:,.0f}".format(summary.total_esic_challan) }}</div><div class="sub">CoSS 2020 — ₹21,000 ceiling</div></div>
+    <div class="card amber"><div class="label">Prof. Tax (MH)</div><div class="value">₹{{ "{:,.0f}".format(summary.total_pt) }}</div><div class="sub">Employee deduction</div></div>
+    {% if summary.compliance_critical > 0 %}
+    <div class="card critical-card"><div class="label">Critical Flags</div><div class="value">{{ summary.compliance_critical }}</div><div class="sub">{{ summary.non_compliant_wage }} wage ratio violations</div></div>
+    {% else %}
+    <div class="card teal"><div class="label">Compliance</div><div class="value">✅ Clean</div><div class="sub">No critical issues</div></div>
+    {% endif %}
+    {% if summary.gratuity_eligible > 0 %}
+    <div class="card purple"><div class="label">Gratuity Eligible</div><div class="value">{{ summary.gratuity_eligible }}</div><div class="sub">Accrued ₹{{ "{:,.0f}".format(summary.total_gratuity_accrued) }}</div></div>
+    {% endif %}
+  </div>
+
+  <!-- Downloads -->
+  <div class="dl-bar">
+    <span>⬇ Downloads:</span>
+    <a href="/download/ecr/{{ session_id }}"               class="btn btn-ecr">📄 ECR File (.txt)</a>
+    <a href="/download/esic/{{ session_id }}"              class="btn btn-esic">🏥 ESIC CSV</a>
+    <a href="/download/bank-file/{{ session_id }}"         class="btn btn-bank">🏦 Bank Payment File</a>
+    <a href="/download/payroll-register/{{ session_id }}"  class="btn btn-reg">📑 Payroll Register</a>
+    <a href="/download/all-slips/{{ session_id }}"         class="btn btn-zip">📦 All Salary Slips (ZIP)</a>
+    <a href="/download/compliance-report/{{ session_id }}" class="btn btn-comp">⚠️ Compliance CSV</a>
+  </div>
+
+  <!-- Employee table -->
+  <div class="section-head"><h2>👥 Employee Payroll Details — New Labour Codes</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID / Name / Type</th>
+          <th>Dept</th>
+          <th>Days</th>
+          <th>Gross (₹)</th>
+          <th>Core Wages</th>
+          <th>Wage Ratio</th>
+          <th>PF Wages</th>
+          <th>Emp PF</th>
+          <th>Er EPF+EPS</th>
+          <th>Emp ESIC</th>
+          <th>PT</th>
+          <th>OT Pay</th>
+          <th>Net Pay (₹)</th>
+          <th>Flags</th>
+          <th>Slip</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in results %}
+        <tr>
+          <td>
+            <div class="emp-id">{{ r.emp_id }}</div>
+            <div class="emp-name">{{ r.name }}</div>
+            <div>
+              {% if r.employment_type == 'fixed_term' %}
+                <span class="tag tag-fte">FTE</span>
+              {% elif r.employment_type == 'gig' %}
+                <span class="tag tag-gig">GIG</span>
+              {% else %}
+                <span class="tag tag-regular">Regular</span>
+              {% endif %}
+              {% if r.esic_applicable %}<span class="tag tag-esic-yes">ESIC</span>{% else %}<span class="tag tag-esic-no">No ESIC</span>{% endif %}
+            </div>
+            {% if r.designation %}<div class="emp-sub">{{ r.designation }}</div>{% endif %}
+          </td>
+          <td style="color:#6e7180;font-size:.73rem">{{ r.department or "—" }}</td>
+          <td>{{ r.days_worked }}/{{ r.days_in_month }}</td>
+          <td class="gross">{{ "{:,.0f}".format(r.gross_earned) }}</td>
+          <td>
+            {{ "{:,.0f}".format(r.core_wages_earned) }}
+            {% if r.pf_base_adjusted %}<span class="tag tag-pf-adj">ADJ</span>{% endif %}
+          </td>
+          <td>
+            {% if r.wage_ratio_compliant %}
+              <span class="tag tag-ok">{{ "%.0f"|format(r.wage_ratio_actual*100) }}%</span>
+            {% else %}
+              <span class="tag tag-critical">{{ "%.0f"|format(r.wage_ratio_actual*100) }}% ⚠️</span>
+            {% endif %}
+          </td>
+          <td>{{ "{:,.0f}".format(r.pf_wages) }}</td>
+          <td class="dedn">{{ "{:,.0f}".format(r.employee_pf) }}</td>
+          <td>{{ "{:,.0f}".format(r.employer_epf + r.employer_eps) }}</td>
+          <td class="dedn">{% if r.esic_applicable %}{{ "{:,.0f}".format(r.employee_esic) }}{% else %}<span class="na">—</span>{% endif %}</td>
+          <td class="dedn">{{ "{:,.0f}".format(r.professional_tax) }}</td>
+          <td>
+            {% if r.ot_pay > 0 %}
+              <span class="tag tag-ot">₹{{ "{:,.0f}".format(r.ot_pay) }}</span>
+              {% if not r.ot_compliant %}<span class="tag tag-critical">⚠️</span>{% endif %}
+            {% else %}
+              <span class="na">—</span>
+            {% endif %}
+          </td>
+          <td class="net">{{ "{:,.0f}".format(r.net_pay) }}</td>
+          <td>
+            {% set crit = r.flags | selectattr('severity', 'equalto', 'critical') | list %}
+            {% set warn = r.flags | selectattr('severity', 'equalto', 'warning')  | list %}
+            {% set info = r.flags | selectattr('severity', 'equalto', 'info')     | list %}
+            {% if crit %}
+              <span class="tag tag-critical">{{ crit|length }} CRIT</span>
+            {% endif %}
+            {% if warn %}
+              <span class="tag tag-warning">{{ warn|length }} WARN</span>
+            {% endif %}
+            {% if info %}
+              <span class="tag tag-ok">{{ info|length }} INFO</span>
+            {% endif %}
+            {% if not r.flags %}
+              <span class="tag tag-ok">✅</span>
+            {% endif %}
+          </td>
+          <td><a href="/download/slip/{{ session_id }}/{{ r.emp_id }}" class="slip-btn">📄 PDF</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Challan summary -->
+  <div class="section-head"><h2>📋 Statutory Challan Summary — New Labour Codes</h2></div>
+  <div class="challan-grid">
+    <div class="challan-card pf">
+      <h3>⚖️ PF Challan — CoSS 2020</h3>
+      <div class="challan-row"><span class="lbl">Employee PF (12%) — New Wages Base</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employee_pf) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer EPF (3.67%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_epf) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer EPS (8.33%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_eps) }}</span></div>
+      {% if summary.non_compliant_wage > 0 %}
+      <div class="challan-row" style="background:#fef2f2;border-radius:4px;padding:.3rem .5rem">
+        <span class="lbl" style="color:#991b1b">⚠️ PF base adjusted for {{ summary.non_compliant_wage }} employee(s)</span>
+        <span class="amt" style="color:#991b1b">50% rule</span>
+      </div>
+      {% endif %}
+      <div class="challan-total"><span>Total PF Challan</span><span>₹{{ "{:,.0f}".format(summary.total_pf_challan) }}</span></div>
+    </div>
+    <div class="challan-card esic">
+      <h3>🏥 ESIC Challan — CoSS 2020</h3>
+      <div class="challan-row"><span class="lbl">Employee Share (0.75%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employee_esic) }}</span></div>
+      <div class="challan-row"><span class="lbl">Employer Share (3.25%)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_employer_esic) }}</span></div>
+      <div class="challan-row"><span class="lbl">Eligible Employees (≤₹21,000)</span><span class="amt">{{ summary.esic_count }}</span></div>
+      <div class="challan-total"><span>Total ESIC Challan</span><span>₹{{ "{:,.0f}".format(summary.total_esic_challan) }}</span></div>
+    </div>
+    <div class="challan-card other">
+      <h3>📋 Other Statutory + Accruals</h3>
+      <div class="challan-row"><span class="lbl">Prof. Tax — Employee (MH)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_pt) }}</span></div>
+      <div class="challan-row"><span class="lbl">LWF — Employee (MH)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_lwf_employee) }}</span></div>
+      <div class="challan-row"><span class="lbl">LWF — Employer (MH)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_lwf_employer) }}</span></div>
+      {% if summary.total_ot_pay > 0 %}
+      <div class="challan-row"><span class="lbl">OT Pay (2× rate — OSH Code)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_ot_pay) }}</span></div>
+      {% endif %}
+      {% if summary.total_gratuity_accrued > 0 %}
+      <div class="challan-row"><span class="lbl">Gratuity Accrual (CoSS S.53)</span><span class="amt">₹{{ "{:,.0f}".format(summary.total_gratuity_accrued) }}</span></div>
+      {% endif %}
+      <div class="challan-total"><span>Total Other</span><span>₹{{ "{:,.0f}".format(summary.total_pt + summary.total_lwf_employee + summary.total_lwf_employer) }}</span></div>
+    </div>
+  </div>
+
+  <!-- Gratuity / OT special summary (shown only if relevant) -->
+  {% if summary.gratuity_eligible > 0 or summary.ot_employees > 0 %}
+  <div class="special-grid">
+    {% if summary.gratuity_eligible > 0 %}
+    <div class="special-card grat">
+      <h3>📄 Gratuity Summary — CoSS 2020 S.53</h3>
+      {% for r in results if r.gratuity_eligible %}
+      <div class="special-row">
+        <span class="lbl">{{ r.name }}
+          {% if r.employment_type == 'fixed_term' %}<span class="tag tag-fte">FTE 1yr</span>{% else %}<span class="tag tag-regular">5yr</span>{% endif %}
+          ({{ r.years_of_service }}y)
+        </span>
+        <span class="amt">₹{{ "{:,.0f}".format(r.gratuity_total_accrued) }}</span>
+      </div>
+      {% endfor %}
+      <div style="margin-top:.6rem;font-size:.75rem;color:#7c3aed;font-weight:600">
+        Total Gratuity Accrued: ₹{{ "{:,.0f}".format(summary.total_gratuity_accrued) }}
+      </div>
+    </div>
+    {% endif %}
+    {% if summary.ot_employees > 0 %}
+    <div class="special-card ot">
+      <h3>🕐 Overtime Summary — OSH Code S.25</h3>
+      {% for r in results if r.ot_hours_month > 0 %}
+      <div class="special-row">
+        <span class="lbl">
+          {{ r.name }}
+          ({{ r.ot_hours_month }}h OT
+          {% if not r.ot_compliant %}<span class="tag tag-critical">⚠️ LIMIT BREACH</span>{% endif %}
+          )
+        </span>
+        <span class="amt">₹{{ "{:,.0f}".format(r.ot_pay) }}</span>
+      </div>
+      {% endfor %}
+      <div style="margin-top:.6rem;font-size:.75rem;color:#1d4ed8;font-weight:600">
+        Total OT Pay: ₹{{ "{:,.0f}".format(summary.total_ot_pay) }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- ECR Preview -->
+  <div class="ecr-wrap">
+    <div class="section-head">
+      <h2>📄 ECR File Preview — CoSS 2020 / EPFO Format</h2>
+      <a href="/download/ecr/{{ session_id }}" class="btn btn-ecr">⬇ Download Full ECR</a>
+    </div>
+    <div class="ecr-preview"><span class="hdr">#~#
+EST_ID~#{{ establishment_id or "MH/MUM/12345" }}
+EST_NAME~#{{ company_name }}
+MONTH~#{{ "%02d"|format(month) }} YEAR~#{{ year }} TOTAL_MEMBERS~#{{ results|length }}
+#~#</span>
+{% for r in results %}<span class="uan">{{ r.uan or "0" }}</span>~#{{ r.name }}~#{{ r.gross_earned|int }}~#{{ r.pf_wages|int }}~#{{ r.pf_wages|int }}~#{{ r.pf_wages|int }}~#{{ (r.employee_pf + r.employer_epf)|int }}~#{{ r.employer_eps|int }}~#{{ (r.employee_pf + r.employer_epf - r.employer_eps)|int }}~#{{ r.ncp_days }}~#0
+{% endfor %}</div>
+    {% if summary.non_compliant_wage > 0 %}
+    <p style="font-size:.76rem;color:#991b1b;margin-top:.5rem;padding:.5rem .8rem;background:#fef2f2;border-radius:6px">
+      ⚠️ PF wages above reflect the 50% CoW-adjusted base for {{ summary.non_compliant_wage }} employee(s) —
+      higher than what basic+DA alone would give. This is the legally correct ECR amount under new Labour Codes.
+    </p>
+    {% endif %}
+  </div>
+
+  <!-- CTA -->
+  <div class="compliance-cta">
+    <div class="text">
+      <h3>📋 View Full New Labour Codes Compliance Report</h3>
+      <p>Per-employee breakdown of all compliance flags — critical, warning, info — with code citations and remediation steps.</p>
+    </div>
+    <a href="/compliance/{{ session_id }}" class="btn-confirm">📋 Open Compliance Report →</a>
+  </div>
+
+</div>
+
+<footer>New Labour Codes Compliant Payroll Tool · CoW 2019 · CoSS 2020 · IRC 2020 · OSH 2020 · {{ month_name }} {{ year }}</footer>
+</body>
+</html>

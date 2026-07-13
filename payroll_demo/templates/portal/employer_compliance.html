@@ -1,0 +1,161 @@
+{% extends "portal/base.html" %}
+{% block title %}Compliance — {{ company.name }}{% endblock %}
+{% block page_title %}Compliance Tracker{% endblock %}
+{% block page_subtitle %}PF · ESIC · PT · TDS filing status for {{ company.name }}{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/employer" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Dashboard
+  </a>
+  <a href="/portal/employer/documents" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+    Document Vault
+  </a>
+  <a href="/portal/employer/compliance" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Compliance
+  </a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Pending alert -->
+<div class="flex items-start gap-4 p-5 bg-amber-50 border border-amber-200 rounded-2xl mb-8">
+  <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"/>
+  </svg>
+  <div>
+    <p class="font-bold text-amber-800">Action required — April 2025 filings due by 15 Apr</p>
+    <p class="text-sm text-amber-700 mt-0.5">PF ECR and ESIC contribution returns for March 2025 payroll are pending upload to government portals. Contact CPS LLP to initiate.</p>
+  </div>
+</div>
+
+<!-- Compliance summary cards -->
+<div class="grid grid-cols-4 gap-5 mb-8">
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <span class="badge-green text-xs">✓ YTD Filed</span>
+    </div>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">EPF / PF</p>
+    <p class="text-xl font-bold text-navy-800 mt-1">Jan–Feb</p>
+    <p class="text-xs text-gray-400 mt-1">Mar pending · Due Apr 15</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-teal-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      </div>
+      <span class="badge-amber text-xs">⏳ Pending</span>
+    </div>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">ESIC</p>
+    <p class="text-xl font-bold text-navy-800 mt-1">Jan–Feb</p>
+    <p class="text-xs text-gray-400 mt-1">Mar pending · Due Apr 15</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+      </div>
+      <span class="badge-green text-xs">✓ Filed</span>
+    </div>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Prof. Tax (MH)</p>
+    <p class="text-xl font-bold text-navy-800 mt-1">Jan–Mar</p>
+    <p class="text-xs text-gray-400 mt-1">Apr due Apr 30</p>
+  </div>
+
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+    <div class="flex items-center justify-between mb-3">
+      <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+      </div>
+      <span class="badge-blue text-xs">Q4 Filing</span>
+    </div>
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">TDS (24Q)</p>
+    <p class="text-xl font-bold text-navy-800 mt-1">Q4 FY25</p>
+    <p class="text-xs text-gray-400 mt-1">Due May 31, 2025</p>
+  </div>
+</div>
+
+<!-- Monthly compliance table -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+  <div class="px-6 py-4 border-b border-gray-100">
+    <h3 class="font-semibold text-gray-800">Monthly Filing Status — FY 2024–25</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b border-gray-100">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Month</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Gross</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">PF Challan</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">PF Status</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">ESIC Challan</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">ESIC Status</th>
+          <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">PT Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for run in runs %}
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-6 py-3 font-semibold text-gray-900">{{ month_names[run.month] }} {{ run.year }}</td>
+          <td class="px-6 py-3 text-right text-gray-700">₹{{ "{:,.0f}".format(run.total_gross) }}</td>
+          <td class="px-6 py-3 text-right text-gray-700">₹{{ "{:,.0f}".format(run.total_pf_challan) }}</td>
+          <td class="px-6 py-3 text-center">
+            {% if run.status == 'disbursed' %}<span class="badge-green">✓ Filed</span>
+            {% else %}<span class="badge-amber">⏳ Pending</span>{% endif %}
+          </td>
+          <td class="px-6 py-3 text-right text-gray-700">₹{{ "{:,.0f}".format(run.total_esic_challan) }}</td>
+          <td class="px-6 py-3 text-center">
+            {% if run.status == 'disbursed' %}<span class="badge-green">✓ Filed</span>
+            {% else %}<span class="badge-amber">⏳ Pending</span>{% endif %}
+          </td>
+          <td class="px-6 py-3 text-center">
+            {% if run.status == 'disbursed' %}<span class="badge-green">✓ Filed</span>
+            {% else %}<span class="badge-amber">⏳ Pending</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Statutory info -->
+<div class="grid grid-cols-3 gap-5">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+    <h4 class="font-semibold text-gray-800 mb-3 text-sm">PF Details</h4>
+    <dl class="space-y-2 text-xs">
+      <div class="flex justify-between"><dt class="text-gray-500">Establishment ID</dt><dd class="font-medium text-gray-900">{{ company.establishment_id }}</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Employee contribution</dt><dd class="font-medium text-gray-900">12% of Basic+DA</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Employer EPF</dt><dd class="font-medium text-gray-900">3.67% (above ₹15k cap)</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Employer EPS</dt><dd class="font-medium text-gray-900">8.33% (capped ₹15,000)</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">EDLI Admin</dt><dd class="font-medium text-gray-900">0.5% (capped ₹15,000)</dd></div>
+    </dl>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+    <h4 class="font-semibold text-gray-800 mb-3 text-sm">ESIC Details</h4>
+    <dl class="space-y-2 text-xs">
+      <div class="flex justify-between"><dt class="text-gray-500">Eligibility threshold</dt><dd class="font-medium text-gray-900">Gross ≤ ₹21,000/mo</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Employee rate</dt><dd class="font-medium text-gray-900">0.75% of gross</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Employer rate</dt><dd class="font-medium text-gray-900">3.25% of gross</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Filing frequency</dt><dd class="font-medium text-gray-900">Monthly (15th)</dd></div>
+    </dl>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+    <h4 class="font-semibold text-gray-800 mb-3 text-sm">Prof. Tax (Maharashtra)</h4>
+    <dl class="space-y-2 text-xs">
+      <div class="flex justify-between"><dt class="text-gray-500">Upto ₹7,500/mo</dt><dd class="font-medium text-gray-900">Nil</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">₹7,501–₹10,000</dt><dd class="font-medium text-gray-900">₹175/mo</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Above ₹10,000</dt><dd class="font-medium text-gray-900">₹200/mo (₹300 Feb)</dd></div>
+      <div class="flex justify-between"><dt class="text-gray-500">Filing frequency</dt><dd class="font-medium text-gray-500">Monthly / Annual</dd></div>
+    </dl>
+  </div>
+</div>
+
+{% endblock %}

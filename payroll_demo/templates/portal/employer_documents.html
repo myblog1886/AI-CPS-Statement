@@ -1,0 +1,140 @@
+{% extends "portal/base.html" %}
+{% block title %}Document Vault — {{ company.name }}{% endblock %}
+{% block page_title %}Document Vault{% endblock %}
+{% block page_subtitle %}All payroll documents pushed by CPS LLP — organized by pay period{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/employer" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Dashboard
+  </a>
+  <a href="/portal/employer/documents" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+    Document Vault
+  </a>
+  <a href="/portal/employer/compliance" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Compliance
+  </a>
+{% endblock %}
+
+{% block content %}
+
+{% set type_icons = {
+  'salary_slip':      ('purple', 'ID card'),
+  'ecr':              ('blue',   'PF ECR'),
+  'esic':             ('teal',   'ESIC'),
+  'bank_advice':      ('green',  'Bank'),
+  'payroll_register': ('indigo', 'Register'),
+  'challan':          ('orange', 'Challan'),
+  'audit_report':     ('red',    'Audit'),
+  'form16':           ('yellow', 'Form 16'),
+} %}
+
+{% for group in runs_with_docs %}
+  {% set run = group.run %}
+  <div class="mb-8 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <!-- Run header -->
+    <div class="px-6 py-4 bg-slate-50 border-b border-gray-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-navy-800 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          {% if run %}
+            <p class="font-bold text-gray-900">{{ month_names[run.month] }} {{ run.year }}</p>
+            <p class="text-xs text-gray-500">
+              {{ run.total_employees }} employees ·
+              Gross ₹{{ "{:,.0f}".format(run.total_gross) }} ·
+              Net ₹{{ "{:,.0f}".format(run.total_net) }}
+            </p>
+          {% else %}
+            <p class="font-bold text-gray-900">Other Documents</p>
+          {% endif %}
+        </div>
+      </div>
+      {% if run %}
+        {% if run.status == 'disbursed' %}
+          <span class="badge-green">✓ Disbursed</span>
+        {% else %}
+          <span class="badge-amber">⏳ Processed</span>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- Document grid — exclude individual salary slips (shown separately) -->
+    {% set company_docs = group.docs | rejectattr('doc_type', 'equalto', 'salary_slip') | list %}
+    {% if company_docs %}
+    <div class="grid grid-cols-2 divide-x divide-y divide-gray-50">
+      {% for doc in company_docs %}
+      <a href="/portal/download/{{ doc.id }}"
+         class="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition group">
+        {% set dtype = doc.doc_type %}
+        {% if dtype == 'ecr' %}{% set bg='bg-blue-100' %}{% set ic='text-blue-600' %}
+        {% elif dtype == 'esic' %}{% set bg='bg-teal-100' %}{% set ic='text-teal-600' %}
+        {% elif dtype == 'bank_advice' %}{% set bg='bg-green-100' %}{% set ic='text-green-600' %}
+        {% elif dtype == 'payroll_register' %}{% set bg='bg-indigo-100' %}{% set ic='text-indigo-600' %}
+        {% elif dtype == 'challan' %}{% set bg='bg-orange-100' %}{% set ic='text-orange-600' %}
+        {% elif dtype == 'audit_report' %}{% set bg='bg-red-100' %}{% set ic='text-red-600' %}
+        {% elif dtype == 'form16' %}{% set bg='bg-yellow-100' %}{% set ic='text-yellow-600' %}
+        {% else %}{% set bg='bg-gray-100' %}{% set ic='text-gray-600' %}{% endif %}
+        <div class="w-10 h-10 rounded-xl {{ bg }} flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5 {{ ic }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-gray-800 group-hover:text-navy-800 transition truncate">
+            {{ doc_type_labels.get(doc.doc_type, doc.doc_type) }}
+          </p>
+          <p class="text-xs text-gray-400 truncate">{{ doc.name }}</p>
+        </div>
+        <svg class="w-4 h-4 text-gray-300 group-hover:text-navy-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Salary slips sub-section -->
+    {% set slips = group.docs | selectattr('doc_type', 'equalto', 'salary_slip') | list %}
+    {% if slips %}
+    <div class="border-t border-gray-100 px-6 py-4">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+        Individual Salary Slips ({{ slips|length }})
+      </p>
+      <div class="flex flex-wrap gap-2">
+        {% for doc in slips %}
+        <a href="/portal/download/{{ doc.id }}"
+           class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 hover:bg-purple-100
+                  border border-purple-200 rounded-lg text-xs font-medium text-purple-700 transition">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          {% set parts = doc.name.split('_') %}
+          {{ parts[1] if parts|length > 1 else doc.name }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+{% endfor %}
+
+{% if not runs_with_docs %}
+<div class="text-center py-20 text-gray-400">
+  <svg class="w-12 h-12 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+  </svg>
+  <p class="font-medium">No documents yet</p>
+  <p class="text-sm mt-1">Documents will appear here once CPS processes your payroll</p>
+</div>
+{% endif %}
+
+{% endblock %}

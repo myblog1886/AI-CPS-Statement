@@ -1,0 +1,9 @@
+emp_id,name,designation,department,uan,pf_number,esic_number,basic,da,hra,special_allowance,other_allowances,ctc_monthly,employment_type,years_of_service,ot_hours_month,daily_avg_hours,leave_balance,days_in_month,days_worked,advance_deduction,bank_account,ifsc_code
+E001,Rahul Sharma,Senior Engineer,Technology,100123456789,MH/MUM/12345/001,1234567890,18000,3600,5000,4400,0,31000,regular,3.5,0,8,12,31,31,0,987654321001,HDFC0001234
+E002,Meera Joshi,HR Executive,Human Resources,100234567890,MH/MUM/12345/002,2345678901,5500,0,1500,7500,1500,20000,regular,2.0,0,8,8,31,31,0,876543212002,ICIC0002345
+E003,Arjun Nair,Operations Manager,Operations,100345678901,MH/MUM/12345/003,3456789012,30000,6000,8000,6000,0,50000,regular,7.2,0,8,28,31,31,0,765432103003,SBIN0003456
+E004,Sunita Rao,Contract Analyst,Finance,100456789012,MH/MUM/12345/004,4567890123,8000,1600,2000,8400,0,20000,fixed_term,1.3,10,10,5,31,28,0,654321004004,AXIS0004567
+E005,Deepak Verma,Delivery Associate,Logistics,100567890123,MH/MUM/12345/005,,7000,1400,1500,5100,0,15000,gig,0.5,0,8,0,31,26,500,543210005005,KOTAK005678
+E006,Priya Kapoor,Marketing Lead,Marketing,100678901234,MH/MUM/12345/006,6789012345,22000,4400,6000,17600,0,50000,regular,5.0,0,8,18,31,31,0,432100006006,KKBK0006789
+E007,Vikram Singh,Warehouse Supervisor,Warehouse,100789012345,MH/MUM/12345/007,7890123456,9000,1800,2000,400,0,14000,regular,4.0,18,13,15,31,31,0,321000007007,PUNB0007890
+E008,Anjali Desai,FTE Developer,Technology,100890123456,MH/MUM/12345/008,8901234567,12000,2400,3500,2100,0,20000,fixed_term,1.0,0,8,32,31,31,0,210000008008,UTIB0008901

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Challan Confirmation — {{ company_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0f2f8; color: #1a1a1a; }
+
+  nav {
+    background: #243673; color: white; padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo-box { background: #3b4fe4; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1rem; padding: .3rem .7rem; border-radius: 6px; margin-right: .8rem; }
+  nav .brand-text { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; }
+  nav a.back { color: rgba(255,255,255,.8); text-decoration: none; font-size: .83rem; }
+  nav a.back:hover { color: white; text-decoration: underline; }
+
+  .page { max-width: 900px; margin: 2rem auto 3rem; padding: 0 1.2rem; }
+
+  /* ── Print action bar ── */
+  .action-bar {
+    display: flex; gap: .8rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: center;
+  }
+  .action-bar h2 { font-family: 'Poppins', sans-serif; font-size: 1rem; color: #243673; font-weight: 700; flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: .35rem; padding: .5rem 1.1rem;
+    border-radius: 8px; font-size: .82rem; font-weight: 600;
+    font-family: 'Poppins', sans-serif; text-decoration: none; cursor: pointer; border: none;
+    transition: all .15s;
+  }
+  .btn-print  { background: #243673; color: white; }
+  .btn-print:hover { background: #1a2a5e; }
+  .btn-dl     { background: #eef0ff; color: #3b4fe4; border: 1.5px solid #a5b4fc; }
+  .btn-dl:hover { background: #dde2ff; }
+  .btn-back   { background: #f3f4f6; color: #374151; border: 1.5px solid #dddddd; }
+
+  /* ── Document ── */
+  .doc {
+    background: white; border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(36,54,115,.12); overflow: hidden;
+  }
+
+  /* Header band */
+  .doc-header {
+    background: linear-gradient(135deg, #243673 0%, #3b4fe4 100%);
+    padding: 2rem 2.5rem; color: white;
+  }
+  .doc-header .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .doc-header .logo { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 800; letter-spacing: .04em; }
+  .doc-header .logo span { background: rgba(255,255,255,.2); padding: .15rem .5rem; border-radius: 6px; }
+  .doc-header .logo-sub { font-size: .78rem; opacity: .75; margin-top: .2rem; }
+  .doc-header .doc-meta { text-align: right; }
+  .doc-header .doc-meta .doc-num { font-family: 'Poppins', sans-serif; font-size: .78rem; opacity: .8; }
+  .doc-header .doc-meta .doc-title { font-family: 'Poppins', sans-serif; font-size: 1.15rem; font-weight: 700; margin-top: .3rem; }
+  .doc-header .doc-meta .doc-period { font-size: .82rem; opacity: .85; margin-top: .15rem; }
+
+  .doc-header .company-strip {
+    margin-top: 1.2rem; padding-top: 1.2rem; border-top: 1px solid rgba(255,255,255,.2);
+    display: flex; gap: 4rem;
+  }
+  .doc-header .company-strip .field label { font-size: .7rem; opacity: .65; text-transform: uppercase; letter-spacing: .07em; font-family: 'Poppins', sans-serif; }
+  .doc-header .company-strip .field p    { font-family: 'Poppins', sans-serif; font-size: .92rem; font-weight: 600; margin-top: .15rem; }
+
+  /* Body */
+  .doc-body { padding: 2rem 2.5rem; }
+
+  /* Status banner */
+  .status-banner {
+    display: flex; align-items: center; gap: 1rem; padding: .9rem 1.2rem;
+    background: #ecfdf5; border: 1.5px solid #86efac; border-radius: 10px;
+    margin-bottom: 1.8rem;
+  }
+  .status-banner .icon { font-size: 1.5rem; }
+  .status-banner h3 { font-family: 'Poppins', sans-serif; font-size: .9rem; font-weight: 700; color: #166534; }
+  .status-banner p  { font-size: .78rem; color: #166534; margin-top: .1rem; }
+
+  /* Challan sections */
+  .challan-section { margin-bottom: 1.8rem; }
+  .challan-section .cs-header {
+    display: flex; align-items: center; gap: .6rem; margin-bottom: .8rem;
+    padding-bottom: .5rem; border-bottom: 2px solid var(--col);
+  }
+  .challan-section .cs-header h3 { font-family: 'Poppins', sans-serif; font-size: .92rem; font-weight: 700; color: var(--col); }
+  .challan-section .cs-header .due-date { margin-left: auto; font-size: .75rem; color: #dc2626; font-weight: 600; font-family: 'Poppins', sans-serif; background: #fee2e2; padding: .2rem .6rem; border-radius: 4px; }
+
+  .cs-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .cs-table th { background: #f8f9ff; color: #243673; font-family: 'Poppins', sans-serif; font-size: .75rem; font-weight: 700; padding: .5rem .7rem; text-align: left; border: 1px solid #e2e5e7; }
+  .cs-table th.r { text-align: right; }
+  .cs-table td { padding: .5rem .7rem; border: 1px solid #f3f4f6; }
+  .cs-table td.r { text-align: right; font-weight: 600; }
+  .cs-table tr:nth-child(even) td { background: #fafbff; }
+  .cs-table .total-row td { background: #eef0ff; font-family: 'Poppins', sans-serif; font-weight: 700; color: #243673; }
+
+  /* Grand total */
+  .grand-total {
+    background: linear-gradient(135deg, #243673 0%, #3b4fe4 100%);
+    border-radius: 12px; padding: 1.2rem 1.6rem; color: white;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.8rem;
+  }
+  .grand-total .label { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; }
+  .grand-total .label p { font-size: .75rem; opacity: .75; margin-top: .15rem; font-weight: 400; }
+  .grand-total .amount { font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800; }
+
+  /* Employee PF detail table */
+  .emp-detail-table { width: 100%; border-collapse: collapse; font-size: .78rem; margin-top: .5rem; }
+  .emp-detail-table th { background: #243673; color: white; font-family: 'Poppins', sans-serif; font-size: .72rem; font-weight: 600; padding: .45rem .6rem; text-align: right; }
+  .emp-detail-table th:first-child, .emp-detail-table th:nth-child(2) { text-align: left; }
+  .emp-detail-table td { padding: .42rem .6rem; border-bottom: 1px solid #f3f4f6; text-align: right; }
+  .emp-detail-table td:first-child, .emp-detail-table td:nth-child(2) { text-align: left; }
+  .emp-detail-table tr:nth-child(even) td { background: #f8f9ff; }
+
+  /* Signature block */
+  .signature-block {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;
+    margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e5e7;
+  }
+  .sig { text-align: center; }
+  .sig .sig-line { border-bottom: 1.5px solid #243673; margin-bottom: .4rem; height: 2.5rem; }
+  .sig .sig-label { font-family: 'Poppins', sans-serif; font-size: .72rem; font-weight: 700; color: #243673; }
+  .sig .sig-sub { font-size: .68rem; color: #6e7180; margin-top: .1rem; }
+
+  /* Disclaimer */
+  .disclaimer {
+    background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
+    padding: .7rem 1rem; font-size: .73rem; color: #78350f; margin-top: 1.5rem;
+  }
+  .disclaimer strong { display: block; margin-bottom: .2rem; }
+
+  footer { background: #243673; color: rgba(255,255,255,.6); text-align: center; font-size: .75rem; padding: 1.2rem; margin-top: 2rem; }
+
+  @media print {
+    nav, .action-bar, footer { display: none !important; }
+    body { background: white; }
+    .page { margin: 0; max-width: 100%; padding: 0; }
+    .doc { border-radius: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center">
+    <div class="logo-box">CPS</div>
+    <div class="brand-text">Corporate Personnel Services LLP</div>
+  </div>
+  <a href="/process" class="back">← Back to Results</a>
+</nav>
+
+<div class="page">
+
+  <div class="action-bar">
+    <h2>📨 Challan Confirmation Statement</h2>
+    <button class="btn btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+    <a href="/download/ecr/{{ session_id }}" class="btn btn-dl">⬇ ECR File</a>
+    <a href="/download/esic/{{ session_id }}" class="btn btn-dl">⬇ ESIC CSV</a>
+    <a href="/" class="btn btn-back">← New Run</a>
+  </div>
+
+  <div class="doc">
+
+    <!-- Header -->
+    <div class="doc-header">
+      <div class="top">
+        <div>
+          <div class="logo"><span>CPS</span> LLP</div>
+          <div class="logo-sub">Corporate Personnel Services LLP · cpsllpgroup.com</div>
+        </div>
+        <div class="doc-meta">
+          <div class="doc-num">REF: CPS/{{ year }}/{{ "%02d"|format(month) }}/CHALLAN</div>
+          <div class="doc-title">Challan Confirmation Statement</div>
+          <div class="doc-period">For the month of {{ month_name }} {{ year }}</div>
+        </div>
+      </div>
+      <div class="company-strip">
+        <div class="field"><label>Employer / Establishment</label><p>{{ company_name }}</p></div>
+        <div class="field"><label>Establishment ID (EPFO)</label><p>{{ establishment_id }}</p></div>
+        <div class="field"><label>Prepared On</label><p>{{ today }}</p></div>
+        <div class="field"><label>Total Employees</label><p>{{ results|length }}</p></div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="doc-body">
+
+      <!-- Status -->
+      <div class="status-banner">
+        <div class="icon">✅</div>
+        <div>
+          <h3>Payroll Computed — Pending Challan Deposit</h3>
+          <p>All statutory contributions have been calculated. Please deposit the challans below by their respective due dates before filing the ECR.</p>
+        </div>
+      </div>
+
+      <!-- PF Challan -->
+      {% set pf_total = summary.total_pf_challan %}
+      <div class="challan-section" style="--col: #3b4fe4">
+        <div class="cs-header">
+          <span style="font-size:1.2rem">⚖️</span>
+          <h3>PF / EPF Challan — EPFO (A/c No. 1, 2, 10, 21, 22)</h3>
+          <span class="due-date">Due: 15th of following month</span>
+        </div>
+        <table class="cs-table">
+          <thead>
+            <tr>
+              <th>Account</th><th>Head</th><th>Rate</th><th class="r">EPF Wages</th><th class="r">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>A/c No. 1</td><td>Employee PF Contribution</td><td>12%</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employee_pf / 0.12) }}</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employee_pf) }}</td></tr>
+            <tr><td>A/c No. 1</td><td>Employer EPF Contribution</td><td>3.67%</td><td class="r">—</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employer_epf) }}</td></tr>
+            <tr><td>A/c No. 10</td><td>Employer EPS Contribution</td><td>8.33% (max ₹1,250/emp)</td><td class="r">—</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employer_eps) }}</td></tr>
+            <tr><td>A/c No. 2</td><td>EDLI Admin Charges</td><td>0.5%</td><td class="r">—</td><td class="r">₹{{ "{:,.0f}".format([summary.total_pf_challan * 0.005, 25]|max) }}</td></tr>
+            <tr><td>A/c No. 22</td><td>EPF Admin Charges</td><td>0.5%</td><td class="r">—</td><td class="r">₹{{ "{:,.0f}".format([summary.total_employee_pf * 0.005, 500]|max) }}</td></tr>
+            <tr class="total-row"><td colspan="4">Total PF Challan (excl. admin)</td><td class="r">₹{{ "{:,.0f}".format(summary.total_pf_challan) }}</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Employee-wise PF -->
+        <details style="margin-top:.8rem">
+          <summary style="cursor:pointer;font-family:'Poppins',sans-serif;font-size:.78rem;font-weight:600;color:#3b4fe4;padding:.3rem 0">▶ Employee-wise PF Breakdown</summary>
+          <table class="emp-detail-table" style="margin-top:.5rem">
+            <thead>
+              <tr>
+                <th>Emp ID</th><th>Name</th><th>UAN</th>
+                <th>PF Wages</th><th>Emp PF</th><th>Er EPF</th><th>Er EPS</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results %}
+              <tr>
+                <td>{{ r.emp_id }}</td><td>{{ r.name }}</td><td style="font-family:monospace;font-size:.72rem">{{ r.uan }}</td>
+                <td>{{ "{:,.0f}".format(r.pf_wages) }}</td>
+                <td>{{ "{:,.0f}".format(r.employee_pf) }}</td>
+                <td>{{ "{:,.0f}".format(r.employer_epf) }}</td>
+                <td>{{ "{:,.0f}".format(r.employer_eps) }}</td>
+                <td style="font-weight:700">{{ "{:,.0f}".format(r.employee_pf + r.employer_epf + r.employer_eps) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </details>
+      </div>
+
+      <!-- ESIC Challan -->
+      <div class="challan-section" style="--col: #065f46">
+        <div class="cs-header">
+          <span style="font-size:1.2rem">🏥</span>
+          <h3>ESIC Challan — ESIC Portal</h3>
+          <span class="due-date">Due: 15th of following month</span>
+        </div>
+        <table class="cs-table">
+          <thead>
+            <tr><th>Head</th><th>Rate</th><th class="r">Eligible Employees</th><th class="r">Amount (₹)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Employee ESIC Contribution</td><td>0.75%</td><td class="r">{{ summary.esic_count }}</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employee_esic) }}</td></tr>
+            <tr><td>Employer ESIC Contribution</td><td>3.25%</td><td class="r">{{ summary.esic_count }}</td><td class="r">₹{{ "{:,.0f}".format(summary.total_employer_esic) }}</td></tr>
+            <tr class="total-row"><td colspan="3">Total ESIC Challan</td><td class="r">₹{{ "{:,.0f}".format(summary.total_esic_challan) }}</td></tr>
+          </tbody>
+        </table>
+        {% if summary.esic_count < results|length %}
+        <p style="font-size:.74rem;color:#6e7180;margin-top:.4rem">
+          ℹ {{ results|length - summary.esic_count }} employee(s) exempt — gross salary exceeds ₹21,000 threshold.
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- PT + LWF -->
+      <div class="challan-section" style="--col: #92400e">
+        <div class="cs-header">
+          <span style="font-size:1.2rem">📋</span>
+          <h3>Professional Tax + LWF — Maharashtra</h3>
+          <span class="due-date">PT due: 31st of month / LWF: Jun &amp; Dec</span>
+        </div>
+        <table class="cs-table">
+          <thead>
+            <tr><th>Head</th><th>Authority</th><th class="r">Amount (₹)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Professional Tax — Employee deduction</td><td>Maharashtra Govt.</td><td class="r">₹{{ "{:,.0f}".format(summary.total_pt) }}</td></tr>
+            <tr><td>LWF — Employee share (MH)</td><td>MH Labour Welfare Board</td><td class="r">₹{{ "{:,.0f}".format(summary.total_lwf_employee) }}</td></tr>
+            <tr><td>LWF — Employer share (MH)</td><td>MH Labour Welfare Board</td><td class="r">₹{{ "{:,.0f}".format(summary.total_lwf_employer) }}</td></tr>
+            <tr class="total-row"><td colspan="2">Total</td><td class="r">₹{{ "{:,.0f}".format(summary.total_pt + summary.total_lwf_employee + summary.total_lwf_employer) }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grand total -->
+      {% set grand = summary.total_pf_challan + summary.total_esic_challan + summary.total_pt + summary.total_lwf_employee + summary.total_lwf_employer %}
+      <div class="grand-total">
+        <div class="label">
+          Total Statutory Challan — {{ month_name }} {{ year }}
+          <p>PF + ESIC + PT + LWF (employee + employer)</p>
+        </div>
+        <div class="amount">₹{{ "{:,.0f}".format(grand) }}</div>
+      </div>
+
+      <!-- Salary summary -->
+      <div class="challan-section" style="--col: #243673">
+        <div class="cs-header">
+          <span style="font-size:1.2rem">💰</span>
+          <h3>Salary Disbursement Summary</h3>
+        </div>
+        <table class="cs-table">
+          <thead><tr><th>Head</th><th class="r">Amount (₹)</th></tr></thead>
+          <tbody>
+            <tr><td>Total Gross Payable</td><td class="r">₹{{ "{:,.0f}".format(summary.total_gross) }}</td></tr>
+            <tr><td>Total Employee Deductions (PF + ESIC + PT + LWF + Advance)</td><td class="r" style="color:#dc2626">— ₹{{ "{:,.0f}".format(summary.total_gross - summary.total_net) }}</td></tr>
+            <tr class="total-row"><td>Net Salary to be Disbursed (Bank Transfer)</td><td class="r">₹{{ "{:,.0f}".format(summary.total_net) }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Signatures -->
+      <div class="signature-block">
+        <div class="sig"><div class="sig-line"></div><div class="sig-label">Prepared By</div><div class="sig-sub">Payroll Executive</div></div>
+        <div class="sig"><div class="sig-line"></div><div class="sig-label">Verified By</div><div class="sig-sub">Finance Manager</div></div>
+        <div class="sig"><div class="sig-line"></div><div class="sig-label">Authorised By</div><div class="sig-sub">Employer / Director</div></div>
+      </div>
+
+      <div class="disclaimer">
+        <strong>⚠️ Important Disclaimer</strong>
+        This challan confirmation is generated by CPS LLP Payroll Copilot for reference purposes.
+        The employer is responsible for verifying all statutory amounts and depositing challans before the due dates.
+        PF challan must be deposited at the EPFO Unified Portal; ESIC at the ESIC Portal.
+        Late deposits attract interest @ 12% p.a. (PF) and damages as per ESIC Act.
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>CPS LLP — Corporate Personnel Services LLP · cpsllpgroup.com · Generated: {{ today }}</footer>
+
+</body>
+</html>

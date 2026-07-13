@@ -1,0 +1,138 @@
+{% extends "portal/base.html" %}
+{% block title %}Employer Dashboard — {{ company.name }}{% endblock %}
+{% block page_title %}{{ company.name }}{% endblock %}
+{% block page_subtitle %}{{ company.establishment_id }} · {{ company.industry }}{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/employer" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    Dashboard
+  </a>
+  <a href="/portal/employer/documents" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+    Document Vault
+  </a>
+  <a href="/portal/employer/compliance" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    Compliance
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+  <div class="stat-card">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Employees</p>
+    <p class="text-3xl font-bold text-navy-800">{{ emp_count }}</p>
+    <p class="text-xs text-gray-400 mt-1">On active payroll</p>
+  </div>
+  <div class="stat-card">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Last Payroll</p>
+    {% if runs %}
+      <p class="text-xl font-bold text-navy-800">{{ month_names[runs[0].month] }} {{ runs[0].year }}</p>
+      <p class="text-xs mt-1">
+        {% if runs[0].status == 'disbursed' %}<span class="badge-green">✓ Disbursed</span>
+        {% else %}<span class="badge-amber">Processed</span>{% endif %}
+      </p>
+    {% else %}
+      <p class="text-xl font-bold text-gray-400">—</p>
+    {% endif %}
+  </div>
+  <div class="stat-card">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">PF Challan (Mar)</p>
+    {% if runs %}<p class="text-2xl font-bold text-navy-800">₹{{ "{:,.0f}".format(runs[0].total_pf_challan) }}</p>{% endif %}
+    <p class="text-xs mt-1"><span class="badge-green">✓ Filed</span></p>
+  </div>
+  <div class="stat-card">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">ESIC Challan (Mar)</p>
+    {% if runs %}<p class="text-2xl font-bold text-navy-800">₹{{ "{:,.0f}".format(runs[0].total_esic_challan) }}</p>{% endif %}
+    <p class="text-xs mt-1"><span class="badge-amber">⏳ Pending</span></p>
+  </div>
+</div>
+
+<div class="grid grid-cols-3 gap-6">
+
+  <!-- Payroll history -->
+  <div class="col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="font-semibold text-gray-800">Payroll History</h3>
+      <a href="/portal/employer/documents" class="text-xs text-navy-800 font-semibold hover:underline">View all documents →</a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 border-b border-gray-100">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Period</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Employees</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Gross</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Net Pay</th>
+            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">PF</th>
+            <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for run in runs %}
+          <tr class="hover:bg-slate-50 transition">
+            <td class="px-6 py-3 font-semibold text-gray-900">{{ month_names[run.month] }} {{ run.year }}</td>
+            <td class="px-6 py-3 text-right text-gray-600">{{ run.total_employees }}</td>
+            <td class="px-6 py-3 text-right text-gray-700">₹{{ "{:,.0f}".format(run.total_gross) }}</td>
+            <td class="px-6 py-3 text-right font-bold text-navy-800">₹{{ "{:,.0f}".format(run.total_net) }}</td>
+            <td class="px-6 py-3 text-right text-gray-600">₹{{ "{:,.0f}".format(run.total_pf_challan) }}</td>
+            <td class="px-6 py-3 text-center">
+              {% if run.status == 'disbursed' %}<span class="badge-green">✓ Disbursed</span>
+              {% else %}<span class="badge-amber">Processed</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Employee list + dept breakdown -->
+  <div class="col-span-1 space-y-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">Employees ({{ emp_count }})</h3>
+      </div>
+      <div class="divide-y divide-gray-50 max-h-72 overflow-y-auto">
+        {% for emp in employees %}
+        <div class="px-4 py-3 flex items-center gap-3 hover:bg-slate-50 transition">
+          <div class="w-8 h-8 rounded-full bg-navy-800/10 flex items-center justify-center flex-shrink-0">
+            <span class="text-navy-800 text-xs font-bold">{{ emp.name[:2].upper() }}</span>
+          </div>
+          <div class="overflow-hidden">
+            <p class="text-sm font-medium text-gray-900 truncate">{{ emp.name }}</p>
+            <p class="text-xs text-gray-400 truncate">{{ emp.designation }} · {{ emp.emp_id }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Dept breakdown -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="font-semibold text-gray-800">By Department</h3>
+      </div>
+      <div class="px-6 py-4 space-y-3">
+        {% set dept_counts = {} %}
+        {% for emp in employees %}
+          {% if emp.department %}
+            {% set _ = dept_counts.update({emp.department: (dept_counts.get(emp.department, 0) + 1)}) %}
+          {% endif %}
+        {% endfor %}
+        {% for dept, count in dept_counts.items() %}
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-700">{{ dept }}</span>
+          <div class="flex items-center gap-2">
+            <div class="h-2 bg-navy-800/20 rounded-full" style="width: {{ count * 30 }}px"></div>
+            <span class="text-xs font-semibold text-navy-800 w-4 text-right">{{ count }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

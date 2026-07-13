@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Upload Payroll — {{ client.name }}{% endblock %}
+{% block content %}
+<h1>Upload Payroll for {{ client.name }}</h1>
+<div class="card">
+  <form method="post" action="/client/upload" enctype="multipart/form-data" id="upload-form">
+    <input type="hidden" name="client_id" value="{{ client.id }}">
+
+    <div class="form-group">
+      <label for="month">Month</label>
+      <select name="month" id="month" required>
+        {% for m in range(1, 13) %}
+        <option value="{{ m }}">{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="year">Year</label>
+      <input type="number" name="year" id="year" value="2025" min="2020" max="2099" required>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <p>Drag &amp; drop your payroll file here, or click to select</p>
+      <input type="file" name="file" id="file-input" accept=".csv,.xlsx,.xls,.pdf,.jpg,.jpeg,.png" required style="display:none">
+      <span id="file-name">No file chosen</span>
+    </div>
+
+    <button type="submit" class="btn">Run Payroll</button>
+  </form>
+</div>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const fileNameSpan = document.getElementById('file-name');
+
+  dropZone.addEventListener('click', () => fileInput.click());
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      fileInput.files = files;
+      fileNameSpan.textContent = files[0].name;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      fileNameSpan.textContent = fileInput.files[0].name;
+    }
+  });
+</script>
+{% endblock %}

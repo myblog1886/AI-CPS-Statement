@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+<h1>Client Management</h1>
+
+<div class="card">
+  <h2>All Clients</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>GSTIN</th>
+        <th>State</th>
+        <th>EPF</th>
+        <th>ESIC</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for client in clients %}
+      <tr>
+        <td>{{ client.name }}</td>
+        <td>{{ client.gstin }}</td>
+        <td>{{ client.state }}</td>
+        <td>{{ "Yes" if client.epf_registered else "No" }}</td>
+        <td>{{ "Yes" if client.esic_registered else "No" }}</td>
+        <td><a href="/client/history?client_id={{ client.id }}">View Runs</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6">No clients yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Add Client</h2>
+  <form method="post" action="/operator/clients/add">
+    <div>
+      <label>Name <input type="text" name="name" required></label>
+    </div>
+    <div>
+      <label>GSTIN <input type="text" name="gstin"></label>
+    </div>
+    <div>
+      <label>State <input type="text" name="state" value="MH"></label>
+    </div>
+    <div>
+      <label><input type="checkbox" name="epf_registered" value="true"> EPF Registered</label>
+    </div>
+    <div>
+      <label><input type="checkbox" name="esic_registered" value="true"> ESIC Registered</label>
+    </div>
+    <button type="submit">Add Client</button>
+  </form>
+</div>
+{% endblock %}

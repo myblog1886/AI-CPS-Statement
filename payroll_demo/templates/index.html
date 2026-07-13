@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CPS LLP — India Payroll Copilot</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0f2f8; min-height: 100vh; color: #1a1a1a; }
+
+  /* ── Navbar ── */
+  nav {
+    background: #243673; color: white;
+    padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .brand { display: flex; align-items: center; gap: .8rem; }
+  nav .brand .logo-box {
+    background: #3b4fe4; color: white; font-family: 'Poppins', sans-serif;
+    font-weight: 800; font-size: 1rem; padding: .3rem .7rem; border-radius: 6px;
+    letter-spacing: .05em;
+  }
+  nav .brand .brand-text { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; }
+  nav .brand .brand-sub { font-size: .72rem; opacity: .7; margin-top: .05rem; }
+  nav .nav-right { font-size: .78rem; opacity: .7; }
+
+  /* ── Hero ── */
+  .hero { text-align: center; padding: 3rem 1rem 1.8rem; }
+  .hero .eyebrow {
+    display: inline-block; background: #3b4fe4; color: white;
+    font-family: 'Poppins', sans-serif; font-size: .72rem; font-weight: 600;
+    padding: .3rem .9rem; border-radius: 999px; letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Poppins', sans-serif; font-size: 2.1rem; font-weight: 800;
+    color: #243673; line-height: 1.2;
+  }
+  .hero h1 span { color: #3b4fe4; }
+  .hero p { color: #6e7180; margin-top: .8rem; font-size: .95rem;
+             max-width: 560px; margin-inline: auto; line-height: 1.6; }
+
+  /* ── Badges ── */
+  .badges { display: flex; justify-content: center; gap: .6rem; flex-wrap: wrap; margin: 1.4rem auto; }
+  .badge {
+    padding: .3rem 1rem; border-radius: 999px; font-size: .76rem; font-weight: 600;
+    border: 1.5px solid; font-family: 'Poppins', sans-serif;
+  }
+  .badge.pf   { color: #243673; border-color: #a5b4fc; background: #eef0ff; }
+  .badge.esic { color: #065f46; border-color: #6ee7b7; background: #ecfdf5; }
+  .badge.ecr  { color: #6d28d9; border-color: #c4b5fd; background: #f5f3ff; }
+  .badge.pt   { color: #92400e; border-color: #fcd34d; background: #fffbeb; }
+  .badge.lwf  { color: #1e40af; border-color: #93c5fd; background: #eff6ff; }
+
+  /* ── Tabs ── */
+  .tabs { max-width: 780px; margin: 0 auto 0; display: flex; gap: .5rem; padding: 0 1rem; }
+  .tab-btn {
+    padding: .55rem 1.2rem; border-radius: 10px 10px 0 0;
+    border: none; cursor: pointer; font-family: 'Poppins', sans-serif;
+    font-size: .85rem; font-weight: 600; transition: all .15s;
+    background: #dde1f0; color: #6e7180;
+  }
+  .tab-btn.active { background: white; color: #3b4fe4; box-shadow: 0 -2px 0 #3b4fe4 inset; }
+
+  /* ── Card ── */
+  .card {
+    background: white; border-radius: 0 16px 16px 16px;
+    box-shadow: 0 4px 24px rgba(36,54,115,0.1);
+    padding: 2rem 2.5rem; max-width: 780px; margin: 0 auto 1rem;
+    display: none;
+  }
+  .card.active { display: block; }
+  .card h2 {
+    font-family: 'Poppins', sans-serif; font-size: 1rem; color: #243673;
+    font-weight: 700; margin-bottom: 1.4rem; padding-bottom: .6rem;
+    border-bottom: 2px solid #e2e5e7;
+  }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: .4rem; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: .8rem; font-weight: 600; color: #243673; font-family: 'Poppins', sans-serif; }
+  input, select {
+    padding: .55rem .8rem; border: 1.5px solid #dddddd; border-radius: 8px;
+    font-size: .88rem; color: #1a1a1a; outline: none; transition: border .2s;
+    font-family: 'Open Sans', sans-serif;
+  }
+  input:focus, select:focus { border-color: #3b4fe4; box-shadow: 0 0 0 3px rgba(59,79,228,.1); }
+
+  /* ── Drop zone ── */
+  .dropzone {
+    border: 2px dashed #a5b4fc; border-radius: 12px; padding: 1.8rem;
+    text-align: center; cursor: pointer; transition: all .2s; background: #f5f6ff;
+  }
+  .dropzone:hover, .dropzone.drag-over { border-color: #3b4fe4; background: #eaedff; }
+  .dropzone input[type=file] { display: none; }
+  .dropzone .icon { font-size: 2.2rem; }
+  .dropzone p { color: #6e7180; font-size: .88rem; margin-top: .5rem; }
+  .dropzone .file-name { color: #3b4fe4; font-weight: 600; margin-top: .4rem; font-size: .85rem; }
+  .dropzone strong { color: #3b4fe4; }
+
+  /* ── Buttons ── */
+  .btn-run {
+    width: 100%; margin-top: 1.4rem; padding: .85rem;
+    background: #3b4fe4; color: white; border: none; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700;
+    cursor: pointer; transition: background .15s, transform .1s;
+  }
+  .btn-run:hover { background: #243673; transform: translateY(-1px); }
+  .btn-run:active { transform: translateY(0); }
+
+  .btn-audit {
+    width: 100%; margin-top: 1.4rem; padding: .85rem;
+    background: #f59e0b; color: white; border: none; border-radius: 10px;
+    font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700;
+    cursor: pointer; transition: background .15s;
+  }
+  .btn-audit:hover { background: #d97706; }
+
+  .month-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: .8rem; }
+
+  /* ── Sample table ── */
+  .sample-section { max-width: 780px; margin: 1.5rem auto; }
+  .sample-section h3 {
+    font-family: 'Poppins', sans-serif; color: #243673;
+    font-size: .9rem; margin-bottom: .7rem; font-weight: 700;
+  }
+  .sample-table-wrap { overflow-x: auto; }
+  table.sample {
+    width: 100%; border-collapse: collapse; font-size: .76rem;
+    background: white; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  table.sample th {
+    background: #243673; color: white; padding: .5rem .7rem;
+    text-align: left; white-space: nowrap; font-family: 'Poppins', sans-serif; font-weight: 600;
+  }
+  table.sample td { padding: .45rem .7rem; border-bottom: 1px solid #f3f4f6; color: #374151; }
+  table.sample tr:last-child td { border: none; }
+  table.sample tr:nth-child(even) td { background: #f9fafb; }
+  .download-sample {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: #3b4fe4; font-size: .82rem; font-weight: 600;
+    text-decoration: none; margin-top: .6rem; font-family: 'Poppins', sans-serif;
+  }
+  .download-sample:hover { text-decoration: underline; }
+
+  /* ── Info strip ── */
+  .info-strip {
+    max-width: 780px; margin: 0 auto 1rem;
+    background: #eef0ff; border: 1px solid #a5b4fc;
+    border-radius: 10px; padding: .8rem 1.2rem;
+    font-size: .8rem; color: #243673; display: flex; gap: .5rem; align-items: flex-start;
+  }
+  .info-strip .icon { font-size: 1rem; flex-shrink: 0; }
+
+  /* ── Missing features showcase ── */
+  .features { max-width: 780px; margin: 0 auto 2rem; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: .8rem; }
+  .feat {
+    background: white; border-radius: 10px; padding: .9rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-top: 3px solid #3b4fe4; font-size: .8rem;
+  }
+  .feat .feat-icon { font-size: 1.3rem; }
+  .feat h4 { font-family: 'Poppins', sans-serif; font-size: .8rem; color: #243673; margin: .3rem 0 .2rem; font-weight: 700; }
+  .feat p { color: #6e7180; line-height: 1.5; }
+  .feat .badge-soon {
+    display: inline-block; background: #fef3c7; color: #92400e;
+    font-size: .65rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-top: .3rem;
+  }
+  .feat .badge-live {
+    display: inline-block; background: #dcfce7; color: #166534;
+    font-size: .65rem; font-weight: 700; padding: .15rem .5rem; border-radius: 4px; margin-top: .3rem;
+  }
+
+  footer {
+    background: #243673; color: rgba(255,255,255,.6);
+    text-align: center; font-size: .76rem; padding: 1.5rem;
+    font-family: 'Open Sans', sans-serif;
+  }
+  footer a { color: rgba(255,255,255,.8); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .section-title {
+    font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700;
+    color: #243673; max-width: 780px; margin: 2rem auto .8rem; padding: 0 .5rem;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">
+    <div class="logo-box">CPS</div>
+    <div>
+      <div class="brand-text">Corporate Personnel Services LLP</div>
+      <div class="brand-sub">India Payroll &amp; Compliance Copilot</div>
+    </div>
+  </div>
+  <div class="nav-right">cpsllpgroup.com · 25+ Years of Expertise</div>
+</nav>
+
+<div class="hero">
+  <div class="eyebrow">🇮🇳 Maharashtra Compliance · FY 2024-25</div>
+  <h1>AI-Powered <span>India Payroll</span><br>& Statutory Compliance</h1>
+  <p>Upload your employee data and instantly generate salary statements, EPFO ECR files, ESIC challans, bank payment advice — fully compliant with Indian statutory requirements.</p>
+</div>
+
+<div class="badges">
+  <span class="badge pf">⚖️ EPF/PF — ₹15,000 ceiling</span>
+  <span class="badge esic">🏥 ESIC — ₹21,000 threshold</span>
+  <span class="badge ecr">📄 ECR 2.0 (EPFO)</span>
+  <span class="badge pt">📋 Prof. Tax — Maharashtra</span>
+  <span class="badge lwf">🏗️ LWF — Maharashtra</span>
+</div>
+
+<!-- ── Tabs ── -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('run')">▶ Run Payroll</button>
+  <button class="tab-btn" onclick="showTab('audit')">🔍 Audit / Compare</button>
+</div>
+
+<!-- ── Run Payroll card ── -->
+<div class="card active" id="tab-run">
+  <h2>📤 Upload Employee Data &amp; Run Payroll</h2>
+  <form action="/process" method="post" enctype="multipart/form-data" id="payrollForm">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Company Name</label>
+        <input type="text" name="company_name" value="Corporate Personnel Services LLP" required>
+      </div>
+      <div class="form-group">
+        <label>Establishment ID (EPFO)</label>
+        <input type="text" name="establishment_id" value="MH/MUM/12345" required>
+      </div>
+      <div class="form-group">
+        <!-- spacer -->
+      </div>
+      <div class="form-group">
+        <label>Payroll Month</label>
+        <select name="month" required>
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4">April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12" selected>December</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Payroll Year</label>
+        <input type="number" name="year" value="2025" min="2020" max="2035" required>
+      </div>
+      <div class="form-group full">
+        <label>Employee Data File (CSV or Excel)</label>
+        <div class="dropzone" id="dropzone1" onclick="document.getElementById('fileInput1').click()">
+          <input type="file" name="file" id="fileInput1" accept=".csv,.xlsx,.xls" required onchange="showFile(this,'fileName1')">
+          <div class="icon">📂</div>
+          <p>Drag &amp; drop or <strong>browse</strong> — supports .csv, .xlsx, .xls</p>
+          <div class="file-name" id="fileName1"></div>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn-run" id="runBtn">▶ Run Payroll &amp; Generate All Files</button>
+  </form>
+</div>
+
+<!-- ── Audit card ── -->
+<div class="card" id="tab-audit">
+  <h2>🔍 Month-over-Month Payroll Audit &amp; Variance Check</h2>
+  <p style="font-size:.83rem;color:#6e7180;margin-bottom:.8rem">
+    Upload two months of payroll data. The system flags salary changes, missing/new employees,
+    PF variance, and attendance changes — before you file incorrect challans.
+  </p>
+  <div style="background:#f0f9ff;border:1.5px solid #bae6fd;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.78rem;color:#0c4a6e">
+    <strong>📂 Try it now with sample data:</strong>
+    Use the two files below — November has 7 employees including deliberate anomalies for the audit to catch.<br>
+    <div style="display:flex;gap:1.2rem;margin-top:.5rem;flex-wrap:wrap">
+      <a href="/sample-csv-prev" style="color:#0369a1;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:.3rem">⬇ November 2025 (previous month)</a>
+      <a href="/sample-csv"      style="color:#0369a1;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:.3rem">⬇ December 2025 (current month)</a>
+    </div>
+  </div>
+  <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:.65rem 1rem;margin-bottom:1rem;font-size:.76rem;color:#78350f">
+    <strong>🔍 Anomalies seeded in this sample data:</strong>
+    <ul style="margin-top:.35rem;padding-left:1.2rem;line-height:1.8">
+      <li><strong>E003 Amit Kumar</strong> — basic jumped from ₹22,000 → ₹25,000 (+13.6%) <em>→ HIGH flag</em></li>
+      <li><strong>E002 Priya Patel</strong> — days worked changed 30 → 28 and advance added ₹500 <em>→ MEDIUM flag</em></li>
+      <li><strong>E004 Sneha Desai</strong> — days worked changed 30 → 25 (LOP) <em>→ MEDIUM flag</em></li>
+      <li><strong>E005 Vijay Nair</strong> — advance deduction added ₹1,000 <em>→ MEDIUM flag</em></li>
+      <li><strong>E007 Ravi Menon</strong> — present in November, missing in December <em>→ HIGH flag (exit/attrition)</em></li>
+    </ul>
+  </div>
+  <form action="/audit" method="post" enctype="multipart/form-data" id="auditForm">
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Company Name</label>
+        <input type="text" name="company_name" value="Corporate Personnel Services LLP">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1rem">
+      <div>
+        <label style="font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;color:#243673">Previous Month File</label>
+        <div class="dropzone" style="margin-top:.4rem" onclick="document.getElementById('prevFile').click()">
+          <input type="file" name="prev_file" id="prevFile" accept=".csv,.xlsx,.xls" required onchange="showFile(this,'prevName')">
+          <div class="icon">📁</div>
+          <p style="font-size:.82rem">Previous month CSV/Excel</p>
+          <div class="file-name" id="prevName"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.7rem">
+          <div class="form-group">
+            <label>Month</label>
+            <select name="prev_month">
+              <option value="11" selected>November</option>
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="12">December</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <input type="number" name="prev_year" value="2025" min="2020" max="2035">
+          </div>
+        </div>
+      </div>
+      <div>
+        <label style="font-family:'Poppins',sans-serif;font-size:.8rem;font-weight:600;color:#243673">Current Month File</label>
+        <div class="dropzone" style="margin-top:.4rem" onclick="document.getElementById('currFile').click()">
+          <input type="file" name="curr_file" id="currFile" accept=".csv,.xlsx,.xls" required onchange="showFile(this,'currName')">
+          <div class="icon">📂</div>
+          <p style="font-size:.82rem">Current month CSV/Excel</p>
+          <div class="file-name" id="currName"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.7rem">
+          <div class="form-group">
+            <label>Month</label>
+            <select name="curr_month">
+              <option value="12" selected>December</option>
+              <option value="1">January</option><option value="2">February</option>
+              <option value="3">March</option><option value="4">April</option>
+              <option value="5">May</option><option value="6">June</option>
+              <option value="7">July</option><option value="8">August</option>
+              <option value="9">September</option><option value="10">October</option>
+              <option value="11">November</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <input type="number" name="curr_year" value="2025" min="2020" max="2035">
+          </div>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="btn-audit" id="auditBtn">🔍 Run Audit &amp; Variance Check</button>
+  </form>
+</div>
+
+<!-- ── Sample format ── -->
+<div class="sample-section">
+  <h3>Expected CSV / Excel Format — Flexible Ingestion</h3>
+  <div class="sample-table-wrap">
+    <table class="sample">
+      <thead>
+        <tr>
+          <th>emp_id</th><th>name</th><th>designation</th><th>department</th>
+          <th>uan</th><th>pf_number</th><th>esic_number</th>
+          <th>basic</th><th>da</th><th>hra</th><th>other_allowances</th>
+          <th>days_in_month</th><th>days_worked</th><th>advance_deduction</th>
+          <th>bank_account</th><th>ifsc_code</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>E001</td><td>Rahul Sharma</td><td>Sr. Executive</td><td>Operations</td>
+          <td>100123456789</td><td>MH/BOM/12345/001</td><td>1234567890</td>
+          <td>12000</td><td>2400</td><td>5000</td><td>1600</td><td>31</td><td>31</td><td>0</td>
+          <td>98765432100</td><td>HDFC0001234</td>
+        </tr>
+        <tr>
+          <td>E002</td><td>Priya Patel</td><td>Accounts Manager</td><td>Finance</td>
+          <td>100234567890</td><td>MH/BOM/12345/002</td><td>2345678901</td>
+          <td>7500</td><td>1500</td><td>2000</td><td>1000</td><td>31</td><td>28</td><td>500</td>
+          <td>87654321200</td><td>ICIC0002345</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <a href="/sample-csv" class="download-sample">⬇ Download full sample CSV (6 employees)</a>
+  <p style="margin-top:.5rem;font-size:.76rem;color:#6e7180">
+    Column names are flexible — also accepted: <code>employee_id</code>, <code>basic_salary</code>, <code>days_present</code>, <code>special_allowance</code>, <code>account_number</code>, etc.
+    If only a <code>gross</code> column is found, components are auto-split 50% Basic / 30% HRA / 20% Other.
+  </p>
+</div>
+
+<!-- ── Feature showcase ── -->
+<div class="section-title">✅ What This Tool Does</div>
+<div class="features">
+  <div class="feat"><div class="feat-icon">⚖️</div><h4>PF / EPF / EPS</h4><p>Employee 12%, Employer EPF 3.67% + EPS 8.33%. Wage ceiling ₹15,000 applied.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">🏥</div><h4>ESIC</h4><p>Employee 0.75%, Employer 3.25%. Auto-eligibility check at ₹21,000 gross.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">📄</div><h4>ECR 2.0 File</h4><p>EPFO-format ECR file ready for direct portal upload. All member rows generated.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">📋</div><h4>Professional Tax</h4><p>Maharashtra PT slabs applied. February slab (₹300) handled automatically.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">🏗️</div><h4>LWF Maharashtra</h4><p>Labour Welfare Fund deducted in June &amp; December. Employee ₹6, Employer ₹12.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">🔍</div><h4>Payroll Audit</h4><p>Month-over-month variance check. Flags salary changes, new/missing employees, PF shifts.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">🏦</div><h4>Bank Payment File</h4><p>NEFT/NACH-format bank transfer advice CSV for direct upload to your bank.</p><span class="badge-live">LIVE</span></div>
+  <div class="feat"><div class="feat-icon">📑</div><h4>Payroll Register</h4><p>Complete statutory payroll register CSV with all components for record-keeping.</p><span class="badge-live">LIVE</span></div>
+</div>
+
+<footer>
+  <strong style="color:white">CPS LLP — Corporate Personnel Services LLP</strong><br>
+  25+ Years of Expertise in Business Compliance · Mumbai, Maharashtra<br>
+  <a href="https://cpsllpgroup.com">cpsllpgroup.com</a>
+</footer>
+
+<script>
+  function showFile(input, targetId) {
+    if (input.files[0]) document.getElementById(targetId).textContent = '✔ ' + input.files[0].name;
+  }
+  function showTab(name) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+  // Drag & drop for main upload
+  const dz = document.getElementById('dropzone1');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) { document.getElementById('fileInput1').files = e.dataTransfer.files; showFile(document.getElementById('fileInput1'), 'fileName1'); }
+  });
+  // Loading states
+  document.getElementById('payrollForm').addEventListener('submit', () => {
+    const btn = document.getElementById('runBtn'); btn.textContent = '⏳ Processing…'; btn.disabled = true;
+  });
+  document.getElementById('auditForm').addEventListener('submit', () => {
+    const btn = document.getElementById('auditBtn'); btn.textContent = '⏳ Analysing…'; btn.disabled = true;
+  });
+  // Auto set current month
+  const now = new Date();
+  document.querySelector('select[name=month]').value = now.getMonth() + 1;
+  document.querySelector('input[name=year]').value = now.getFullYear();
+</script>
+</body>
+</html>

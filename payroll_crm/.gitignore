@@ -1,0 +1,7 @@
+.env
+payroll_crm.db
+uploads/
+outputs/
+__pycache__/
+*.pyc
+.pytest_cache/

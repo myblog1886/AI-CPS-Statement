@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payroll Audit — {{ company_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: #f0f2f8; color: #1a1a1a; }
+
+  nav {
+    background: #243673; color: white; padding: 0 2rem; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav .logo-box { background: #3b4fe4; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 1rem; padding: .3rem .7rem; border-radius: 6px; margin-right: .8rem; }
+  nav .brand-text { font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 1rem; }
+  nav a.back { color: rgba(255,255,255,.8); text-decoration: none; font-size: .83rem; }
+  nav a.back:hover { text-decoration: underline; color: white; }
+
+  .page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.2rem 3rem; }
+
+  /* ── Header ── */
+  .audit-header {
+    background: white; border-radius: 12px; padding: 1.1rem 1.5rem;
+    border-left: 5px solid #f59e0b;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .8rem;
+  }
+  .audit-header h1 { font-family: 'Poppins', sans-serif; font-size: 1.05rem; color: #243673; font-weight: 800; }
+  .audit-header p  { font-size: .82rem; color: #6e7180; margin-top: .15rem; }
+  .period-compare {
+    display: flex; align-items: center; gap: .7rem;
+    font-family: 'Poppins', sans-serif; font-size: .82rem; font-weight: 700;
+  }
+  .period-compare .p1 { background: #f3f4f6; color: #374151; padding: .35rem .9rem; border-radius: 999px; }
+  .period-compare .arrow { color: #9ca3af; }
+  .period-compare .p2 { background: #eef0ff; color: #3b4fe4; padding: .35rem .9rem; border-radius: 999px; }
+
+  /* ── Alert summary ── */
+  .alert-counts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.4rem; }
+  .alert-card {
+    background: white; border-radius: 12px; padding: 1rem 1.2rem;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); border-top: 4px solid var(--ac);
+    text-align: center;
+  }
+  .alert-card .ac-icon { font-size: 1.5rem; }
+  .alert-card .ac-num  { font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--ac); margin-top: .15rem; }
+  .alert-card .ac-lbl  { font-size: .74rem; color: #6e7180; font-family: 'Poppins', sans-serif; font-weight: 600; }
+  .alert-card.high   { --ac: #dc2626; }
+  .alert-card.medium { --ac: #d97706; }
+  .alert-card.info   { --ac: #3b4fe4; }
+  .alert-card.ok     { --ac: #059669; }
+
+  /* ── Comparison table ── */
+  .compare-card {
+    background: white; border-radius: 12px; padding: 1.2rem 1.5rem;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem;
+  }
+  .compare-card h2 { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; color: #243673; margin-bottom: 1rem; }
+  .compare-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: .5rem; }
+  .cg-header { font-family: 'Poppins', sans-serif; font-size: .72rem; font-weight: 700; color: #6e7180; text-transform: uppercase; padding: .3rem .5rem; }
+  .cg-header.r { text-align: right; }
+  .cg-row { display: contents; }
+  .cg-row .cell { padding: .5rem .5rem; border-bottom: 1px solid #f3f4f6; font-size: .83rem; display: flex; align-items: center; }
+  .cg-row .cell.r { justify-content: flex-end; font-family: 'Poppins', sans-serif; font-weight: 700; }
+  .cg-row .cell.label { color: #374151; }
+  .cg-row .cell.curr  { color: #243673; }
+  .delta-up   { color: #dc2626; font-size: .72rem; margin-left: .4rem; font-weight: 700; }
+  .delta-down { color: #059669; font-size: .72rem; margin-left: .4rem; font-weight: 700; }
+  .delta-zero { color: #9ca3af; font-size: .72rem; margin-left: .4rem; }
+
+  /* ── Flags table ── */
+  .flags-card {
+    background: white; border-radius: 12px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(36,54,115,.08); margin-bottom: 1.4rem;
+  }
+  .flags-card .fc-header {
+    padding: 1rem 1.4rem; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .flags-card .fc-header h2 { font-family: 'Poppins', sans-serif; font-size: .95rem; font-weight: 700; color: #243673; }
+
+  table.flags-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+  table.flags-table thead tr { background: #243673; color: white; }
+  table.flags-table thead th { padding: .6rem .8rem; text-align: left; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: .75rem; }
+  table.flags-table tbody tr:nth-child(even) { background: #f8f9ff; }
+  table.flags-table tbody tr:hover { background: #fff7ed; }
+  table.flags-table tbody td { padding: .55rem .8rem; border-bottom: 1px solid #f3f4f6; }
+  table.flags-table tbody tr:last-child td { border: none; }
+
+  .sev-high   { background: #fee2e2; color: #b91c1c; padding: .18rem .55rem; border-radius: 4px; font-size: .7rem; font-weight: 700; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .sev-medium { background: #fef3c7; color: #92400e; padding: .18rem .55rem; border-radius: 4px; font-size: .7rem; font-weight: 700; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+  .sev-info   { background: #dbeafe; color: #1e40af; padding: .18rem .55rem; border-radius: 4px; font-size: .7rem; font-weight: 700; font-family: 'Poppins', sans-serif; white-space: nowrap; }
+
+  .type-var  { color: #d97706; font-weight: 700; }
+  .type-new  { color: #059669; font-weight: 700; }
+  .type-miss { color: #dc2626; font-weight: 700; }
+
+  .change-up   { color: #dc2626; font-weight: 700; }
+  .change-down { color: #059669; font-weight: 700; }
+
+  /* ── All-clear ── */
+  .all-clear {
+    background: #ecfdf5; border: 1.5px solid #86efac; border-radius: 12px;
+    padding: 2rem; text-align: center; margin-bottom: 1.4rem;
+  }
+  .all-clear .icon { font-size: 2.5rem; }
+  .all-clear h2 { font-family: 'Poppins', sans-serif; color: #166534; font-size: 1.1rem; font-weight: 700; margin-top: .5rem; }
+  .all-clear p  { color: #166534; font-size: .85rem; margin-top: .3rem; }
+
+  /* ── CTA ── */
+  .cta-bar {
+    background: linear-gradient(135deg, #243673 0%, #3b4fe4 100%);
+    border-radius: 12px; padding: 1.2rem 1.8rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .cta-bar .text h3 { font-family: 'Poppins', sans-serif; color: white; font-size: .95rem; font-weight: 700; }
+  .cta-bar .text p  { color: rgba(255,255,255,.75); font-size: .8rem; margin-top: .15rem; }
+  .btn-proceed {
+    background: white; color: #243673; border: none;
+    padding: .65rem 1.5rem; border-radius: 8px;
+    font-family: 'Poppins', sans-serif; font-size: .85rem; font-weight: 700;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+    white-space: nowrap;
+  }
+  .btn-proceed:hover { background: #eef0ff; }
+  .btn-secondary {
+    background: rgba(255,255,255,.15); color: white; border: 1.5px solid rgba(255,255,255,.4);
+    padding: .65rem 1.2rem; border-radius: 8px;
+    font-family: 'Poppins', sans-serif; font-size: .85rem; font-weight: 600;
+    text-decoration: none; display: inline-flex; align-items: center; gap: .4rem;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,.25); }
+
+  footer { background: #243673; color: rgba(255,255,255,.6); text-align: center; font-size: .76rem; padding: 1.2rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center">
+    <div class="logo-box">CPS</div>
+    <div class="brand-text">Corporate Personnel Services LLP — Payroll Audit</div>
+  </div>
+  <a href="/" class="back">← New Run</a>
+</nav>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="audit-header">
+    <div>
+      <h1>🔍 Month-over-Month Payroll Audit</h1>
+      <p>{{ company_name }} — variance analysis before filing challans</p>
+    </div>
+    <div class="period-compare">
+      <span class="p1">{{ prev_month }} {{ prev_year }}</span>
+      <span class="arrow">→</span>
+      <span class="p2">{{ curr_month }} {{ curr_year }}</span>
+    </div>
+  </div>
+
+  <!-- Alert counts -->
+  {% set high_flags   = flags | selectattr("severity","eq","high")   | list %}
+  {% set medium_flags = flags | selectattr("severity","eq","medium") | list %}
+  {% set info_flags   = flags | selectattr("severity","eq","info")   | list %}
+  <div class="alert-counts">
+    <div class="alert-card high">
+      <div class="ac-icon">🚨</div>
+      <div class="ac-num">{{ high_flags|length }}</div>
+      <div class="ac-lbl">High Severity</div>
+    </div>
+    <div class="alert-card medium">
+      <div class="ac-icon">⚠️</div>
+      <div class="ac-num">{{ medium_flags|length }}</div>
+      <div class="ac-lbl">Medium Variance</div>
+    </div>
+    <div class="alert-card info">
+      <div class="ac-icon">ℹ️</div>
+      <div class="ac-num">{{ info_flags|length }}</div>
+      <div class="ac-lbl">New Employees</div>
+    </div>
+    <div class="alert-card ok">
+      <div class="ac-icon">✅</div>
+      <div class="ac-num">{{ curr_summary.total_employees - (high_flags|length + medium_flags|length) }}</div>
+      <div class="ac-lbl">No Issues</div>
+    </div>
+  </div>
+
+  <!-- Month comparison -->
+  <div class="compare-card">
+    <h2>📊 Summary Comparison: {{ prev_month }} {{ prev_year }} vs {{ curr_month }} {{ curr_year }}</h2>
+    <div class="compare-grid">
+      <div class="cg-header">Metric</div>
+      <div class="cg-header r">{{ prev_month }} {{ prev_year }}</div>
+      <div class="cg-header r">{{ curr_month }} {{ curr_year }}</div>
+      <div class="cg-header r">Change</div>
+
+      {% set rows = [
+        ("Total Employees",   prev_summary.total_employees,   curr_summary.total_employees,   false),
+        ("Total Gross (₹)",   prev_summary.total_gross,       curr_summary.total_gross,       true),
+        ("Total Net Pay (₹)", prev_summary.total_net,         curr_summary.total_net,         true),
+        ("PF Challan (₹)",    prev_summary.total_pf_challan,  curr_summary.total_pf_challan,  true),
+        ("ESIC Challan (₹)",  prev_summary.total_esic_challan,curr_summary.total_esic_challan,true),
+        ("Prof. Tax (₹)",     prev_summary.total_pt,          curr_summary.total_pt,          true),
+        ("ESIC Eligible",     prev_summary.esic_count,        curr_summary.esic_count,        false),
+      ] %}
+      {% for label, pval, cval, is_inr in rows %}
+      <div class="cg-row">
+        <div class="cell label">{{ label }}</div>
+        <div class="cell r">{% if is_inr %}₹{{ "{:,.0f}".format(pval) }}{% else %}{{ pval }}{% endif %}</div>
+        <div class="cell r curr">{% if is_inr %}₹{{ "{:,.0f}".format(cval) }}{% else %}{{ cval }}{% endif %}</div>
+        <div class="cell r">
+          {% if pval != 0 %}
+            {% set pct = ((cval - pval) / pval * 100)|round(1) %}
+            {% if pct > 0 %}<span class="delta-up">▲ {{ pct }}%</span>
+            {% elif pct < 0 %}<span class="delta-down">▼ {{ (pct * -1) }}%</span>
+            {% else %}<span class="delta-zero">— 0%</span>{% endif %}
+          {% else %}<span class="delta-zero">—</span>{% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Flags -->
+  {% if flags %}
+  <div class="flags-card">
+    <div class="fc-header">
+      <h2>🚩 Variance Flags — Review Before Filing</h2>
+      <span style="font-size:.78rem;color:#6e7180">{{ flags|length }} flag(s) detected</span>
+    </div>
+    <table class="flags-table">
+      <thead>
+        <tr>
+          <th>Severity</th><th>Type</th><th>Emp ID</th><th>Employee</th>
+          <th>Field</th><th>Previous</th><th>Current</th><th>Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in flags | sort(attribute="severity") %}
+        <tr>
+          <td>
+            {% if f.severity == "high" %}<span class="sev-high">🚨 HIGH</span>
+            {% elif f.severity == "medium" %}<span class="sev-medium">⚠️ MEDIUM</span>
+            {% else %}<span class="sev-info">ℹ️ INFO</span>{% endif %}
+          </td>
+          <td>
+            {% if f.type == "VARIANCE" %}<span class="type-var">VARIANCE</span>
+            {% elif f.type == "NEW_EMPLOYEE" %}<span class="type-new">NEW EMP</span>
+            {% else %}<span class="type-miss">MISSING</span>{% endif %}
+          </td>
+          <td style="font-family:'Poppins',sans-serif;font-weight:700;color:#3b4fe4">{{ f.emp_id }}</td>
+          <td>{{ f.name }}</td>
+          <td style="font-weight:600">{{ f.field }}</td>
+          <td style="color:#6e7180">{{ f.prev }}</td>
+          <td style="font-weight:600">{{ f.curr }}</td>
+          <td>
+            {% if f.change_pct != "—" %}
+              {% if "+" in f.change_pct|string %}<span class="change-up">{{ f.change_pct }}</span>
+              {% else %}<span class="change-down">{{ f.change_pct }}</span>{% endif %}
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if high_flags %}
+  <div style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:10px;padding:.9rem 1.2rem;margin-bottom:1.4rem;font-size:.82rem;color:#b91c1c">
+    <strong>🚨 {{ high_flags|length }} high-severity flag(s) detected.</strong>
+    Review these employees carefully before depositing challans or filing the ECR with EPFO.
+    Incorrect filings attract penalties and require revision submissions.
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="all-clear">
+    <div class="icon">✅</div>
+    <h2>No significant variances detected</h2>
+    <p>All employee salaries, PF contributions, and attendance are within acceptable thresholds compared to {{ prev_month }} {{ prev_year }}.</p>
+  </div>
+  {% endif %}
+
+  <!-- CTA -->
+  <div class="cta-bar">
+    <div class="text">
+      <h3>{% if high_flags %}Review flags above, then proceed to process {{ curr_month }} {{ curr_year }} payroll{% else %}✅ Audit passed — proceed to process {{ curr_month }} {{ curr_year }} payroll{% endif %}</h3>
+      <p>Downloads: ECR file, ESIC CSV, salary slips, bank file, payroll register</p>
+    </div>
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+      <a href="/download/ecr/{{ session_id }}"   class="btn-secondary">📄 ECR File</a>
+      <a href="/challan-confirmation/{{ session_id }}" class="btn-proceed">📋 Challan Confirmation →</a>
+    </div>
+  </div>
+
+</div>
+
+<footer>CPS LLP — Corporate Personnel Services LLP · cpsllpgroup.com</footer>
+</body>
+</html>

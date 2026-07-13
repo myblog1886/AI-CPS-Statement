@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Downloads — {{ client.name }} — {{ run.month }}/{{ run.year }}{% endblock %}
+{% block content %}
+<h1>Downloads — {{ client.name }} — {{ "%02d"|format(run.month) }}/{{ run.year }}</h1>
+<p>Run #{{ run.id }} &nbsp;|&nbsp; Status: <span class="badge badge-{{ run.status }}">{{ run.status }}</span></p>
+
+<div class="download-grid">
+  <div class="card">
+    <h3>EPFO ECR TXT</h3>
+    <p>ECR 2.0 pipe-delimited file for EPFO portal upload.</p>
+    <a href="/client/download/{{ run.id }}/ecr" class="btn">Download .txt</a>
+  </div>
+
+  <div class="card">
+    <h3>ESIC Contribution CSV</h3>
+    <p>Monthly ESIC contribution file for ESIC portal upload.</p>
+    <a href="/client/download/{{ run.id }}/esic" class="btn">Download .csv</a>
+  </div>
+
+  <div class="card">
+    <h3>Salary Slips ZIP</h3>
+    <p>Individual HTML salary slips for all employees.</p>
+    <a href="/client/download/{{ run.id }}/slips" class="btn">Download .zip</a>
+  </div>
+
+  <div class="card">
+    <h3>Bank Transfer CSV</h3>
+    <p>Net salary transfer file for bulk bank upload.</p>
+    <a href="/client/download/{{ run.id }}/bank" class="btn">Download .csv</a>
+  </div>
+
+  <div class="card">
+    <h3>Compliance Report PDF</h3>
+    <p>Detailed compliance findings and recommendations.</p>
+    <a href="/client/download/{{ run.id }}/compliance" class="btn">Download .pdf</a>
+  </div>
+</div>
+
+<p><a href="/client/history?client_id={{ client.id }}">&larr; Back to Run History</a></p>
+{% endblock %}

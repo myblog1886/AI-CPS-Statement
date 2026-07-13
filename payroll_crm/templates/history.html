@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Run History — {{ client.name }}{% endblock %}
+{% block content %}
+<h1>Run History — {{ client.name }}</h1>
+
+<p><a href="/client/upload?client_id={{ client.id }}" class="btn">+ Start New Run</a></p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Month/Year</th>
+      <th>Status</th>
+      <th>Created At</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for run in runs %}
+    <tr>
+      <td>{{ "%02d"|format(run.month) }}/{{ run.year }}</td>
+      <td><span class="badge badge-{{ run.status }}">{{ run.status }}</span></td>
+      <td>{{ run.created_at.strftime("%Y-%m-%d %H:%M") if run.created_at else "—" }}</td>
+      <td>
+        <a href="/client/review/{{ run.id }}">View Review</a>
+        {% if run.status == "approved" %}
+        &nbsp;|&nbsp;
+        <a href="/client/download/{{ run.id }}">Download</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4">No runs yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

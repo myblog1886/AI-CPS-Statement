@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Payroll CRM{% endblock %} — CPS LLP</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav>
+    <span class="brand">CPS LLP · Payroll CRM</span>
+    {% if request.session.get("user_id") %}
+    <div class="nav-links">
+      {% if role == "operator" %}
+        <a href="/operator/dashboard">Dashboard</a>
+        <a href="/operator/clients">Clients</a>
+      {% endif %}
+      <a href="/operator/clients">New Run</a>
+      <a href="/operator/clients">History</a>
+      <form method="post" action="/logout" style="display:inline">
+        <button type="submit" class="btn-link">Logout</button>
+      </form>
+    </div>
+    {% endif %}
+  </nav>
+  <main>{% block content %}{% endblock %}</main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

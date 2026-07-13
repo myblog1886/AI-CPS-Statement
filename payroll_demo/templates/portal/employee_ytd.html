@@ -1,0 +1,217 @@
+{% extends "portal/base.html" %}
+{% block title %}YTD Summary — {{ user.name }}{% endblock %}
+{% block page_title %}Year-to-Date Summary{% endblock %}
+{% block page_subtitle %}FY 2024–25 earnings &amp; deductions breakdown{% endblock %}
+
+{% block sidebar_links %}
+  <a href="/portal/employee" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    My Dashboard
+  </a>
+  <a href="/portal/employee/payslips" class="sidebar-link">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    My Payslips
+  </a>
+  <a href="/portal/employee/ytd" class="sidebar-link active">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    YTD Summary
+  </a>
+{% endblock %}
+
+{% block content %}
+
+{% set ytd_gross = monthly | map(attribute='gross') | sum %}
+{% set ytd_net   = monthly | map(attribute='net')   | sum %}
+{% set ytd_pf    = monthly | map(attribute='pf')    | sum %}
+{% set ytd_esic  = monthly | map(attribute='esic')  | sum %}
+{% set ytd_deduct = ytd_gross - ytd_net %}
+
+<!-- Top stats -->
+<div class="grid grid-cols-4 gap-6 mb-8">
+  <div class="stat-card border-l-4 border-navy-800">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Gross Earned</p>
+    <p class="text-3xl font-black text-navy-800">₹{{ "{:,.0f}".format(ytd_gross) }}</p>
+    <p class="text-xs text-gray-400 mt-1">FY 2024–25 YTD</p>
+  </div>
+  <div class="stat-card border-l-4 border-green-500">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Net Received</p>
+    <p class="text-3xl font-black text-green-700">₹{{ "{:,.0f}".format(ytd_net) }}</p>
+    <p class="text-xs text-gray-400 mt-1">Credited to bank</p>
+  </div>
+  <div class="stat-card border-l-4 border-blue-500">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">PF Contribution (Emp)</p>
+    <p class="text-3xl font-black text-blue-700">₹{{ "{:,.0f}".format(ytd_pf) }}</p>
+    <p class="text-xs text-gray-400 mt-1">Your share deposited</p>
+  </div>
+  <div class="stat-card border-l-4 border-teal-500">
+    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">ESIC Contribution</p>
+    <p class="text-3xl font-black text-teal-700">₹{{ "{:,.0f}".format(ytd_esic) }}</p>
+    <p class="text-xs text-gray-400 mt-1">Health insurance fund</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-3 gap-6">
+
+  <!-- Monthly bar chart (CSS-based) -->
+  <div class="col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100">
+      <h3 class="font-semibold text-gray-800">Monthly Earnings — FY 2025</h3>
+    </div>
+    <div class="px-6 py-6">
+      {% if monthly %}
+        {% set max_gross = monthly | map(attribute='gross') | max %}
+        <div class="space-y-4">
+          {% for m in monthly %}
+          <div class="flex items-center gap-4">
+            <span class="text-xs font-semibold text-gray-500 w-10 text-right flex-shrink-0">{{ m.month[:3] }}</span>
+            <div class="flex-1 flex items-center gap-2">
+              <!-- Gross bar -->
+              <div class="relative flex-1 h-7 bg-slate-100 rounded-lg overflow-hidden">
+                <div class="absolute inset-y-0 left-0 bg-navy-800/20 rounded-lg transition-all"
+                     style="width: {{ ((m.gross / max_gross) * 100)|round }}%"></div>
+                <div class="absolute inset-y-0 left-0 bg-navy-800 rounded-lg transition-all"
+                     style="width: {{ ((m.net / max_gross) * 100)|round }}%"></div>
+                <div class="absolute inset-0 flex items-center justify-between px-3">
+                  <span class="text-xs font-bold text-white drop-shadow">₹{{ "{:,.0f}".format(m.net) }}</span>
+                  <span class="text-xs text-gray-500">₹{{ "{:,.0f}".format(m.gross) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="flex items-center gap-6 mt-4 text-xs text-gray-500">
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-navy-800"></div> Net Pay</div>
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded bg-navy-800/20"></div> Gross</div>
+        </div>
+      {% else %}
+        <p class="text-gray-400 text-sm text-center py-8">No data available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Deductions breakdown -->
+  <div class="col-span-1 space-y-5">
+
+    <!-- Earnings vs deductions donut (CSS approximation) -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+      <h4 class="font-semibold text-gray-800 text-sm mb-4">Earnings Breakdown</h4>
+      {% if ytd_gross > 0 %}
+        {% set net_pct    = ((ytd_net    / ytd_gross) * 100) | round(1) %}
+        {% set pf_pct     = ((ytd_pf     / ytd_gross) * 100) | round(1) %}
+        {% set esic_pct   = ((ytd_esic   / ytd_gross) * 100) | round(1) %}
+        {% set other_pct  = (100 - net_pct - pf_pct - esic_pct) | round(1) %}
+      {% else %}
+        {% set net_pct = 0 %}{% set pf_pct = 0 %}{% set esic_pct = 0 %}{% set other_pct = 0 %}
+      {% endif %}
+      <div class="space-y-3">
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-600 font-medium">Net Pay (take-home)</span>
+            <span class="font-bold text-green-700">{{ net_pct }}%</span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-green-500 rounded-full" style="width:{{ net_pct }}%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-600 font-medium">PF (Employee share)</span>
+            <span class="font-bold text-blue-700">{{ pf_pct }}%</span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-blue-500 rounded-full" style="width:{{ pf_pct }}%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-600 font-medium">ESIC</span>
+            <span class="font-bold text-teal-700">{{ esic_pct }}%</span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-teal-500 rounded-full" style="width:{{ esic_pct }}%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1">
+            <span class="text-gray-600 font-medium">PT &amp; Other</span>
+            <span class="font-bold text-gray-600">{{ other_pct }}%</span>
+          </div>
+          <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="h-full bg-gray-400 rounded-full" style="width:{{ other_pct }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tax projection card -->
+    <div class="bg-gradient-to-br from-navy-800 to-navy-900 rounded-2xl p-5 text-white">
+      <h4 class="font-semibold text-sm mb-3">FY25 Tax Projection</h4>
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-blue-300">Gross Annual (proj.)</span>
+          <span class="font-bold">₹{{ "{:,.0f}".format(ytd_gross * 4) }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-blue-300">Std. Deduction</span>
+          <span class="font-bold">₹75,000</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-blue-300">PF (80C)</span>
+          <span class="font-bold">₹{{ "{:,.0f}".format(ytd_pf * 4) }}</span>
+        </div>
+        <div class="border-t border-white/20 pt-2 flex justify-between">
+          <span class="text-amber-300 font-semibold">Estimated Taxable</span>
+          <span class="font-bold text-amber-300">
+            ₹{{ "{:,.0f}".format([ytd_gross * 4 - 75000 - ytd_pf * 4, 0] | max) }}
+          </span>
+        </div>
+      </div>
+      <p class="text-blue-400 text-xs mt-3">* Projection based on YTD data. Consult your CA for accurate tax planning.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly detail table -->
+<div class="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-100">
+    <h3 class="font-semibold text-gray-800">Monthly Detail</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 border-b border-gray-100">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Month</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Gross</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">PF (Emp)</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">ESIC</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Total Deductions</th>
+          <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Net Pay</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for m in monthly %}
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-6 py-3 font-semibold text-gray-900">{{ m.month }}</td>
+          <td class="px-6 py-3 text-right text-gray-700">₹{{ "{:,.0f}".format(m.gross) }}</td>
+          <td class="px-6 py-3 text-right text-blue-600">₹{{ "{:,.0f}".format(m.pf) }}</td>
+          <td class="px-6 py-3 text-right text-teal-600">₹{{ "{:,.0f}".format(m.esic) }}</td>
+          <td class="px-6 py-3 text-right text-red-500">₹{{ "{:,.0f}".format(m.gross - m.net) }}</td>
+          <td class="px-6 py-3 text-right font-bold text-navy-800">₹{{ "{:,.0f}".format(m.net) }}</td>
+        </tr>
+        {% endfor %}
+        <!-- Totals row -->
+        <tr class="bg-navy-800 text-white font-bold">
+          <td class="px-6 py-3">YTD Total</td>
+          <td class="px-6 py-3 text-right">₹{{ "{:,.0f}".format(ytd_gross) }}</td>
+          <td class="px-6 py-3 text-right">₹{{ "{:,.0f}".format(ytd_pf) }}</td>
+          <td class="px-6 py-3 text-right">₹{{ "{:,.0f}".format(ytd_esic) }}</td>
+          <td class="px-6 py-3 text-right">₹{{ "{:,.0f}".format(ytd_deduct) }}</td>
+          <td class="px-6 py-3 text-right text-amber-300">₹{{ "{:,.0f}".format(ytd_net) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
